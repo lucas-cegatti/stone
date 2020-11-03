@@ -1,0 +1,30 @@
+version: "3.3"
+
+services:
+  stone:
+    build:
+      context: .
+      args:
+        - ENV=prod
+      cache_from:
+        - elixir:1.10.3-alpine
+        - stone
+    depends_on:
+      - db
+    ports:
+      - "4000:4000"
+    environment:
+      DB_NAME: framework_dev
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASS: postgres
+      SECRET_KEY_BASE: MBBhVeA0yci+a94dbzKqgog3yjNKVHe63FFPEHmsELr6idwPivSxRNSUIs09B13w
+  db:
+    image: postgres:11.5-alpine
+    volumes:
+      - /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
