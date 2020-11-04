@@ -6,9 +6,19 @@ defmodule Stone.AccountsTest do
   describe "users" do
     alias Stone.Accounts.User
 
-    @valid_attrs %{email: "some email", name: "some name", password_hash: "some password_hash"}
-    @update_attrs %{email: "some updated email", name: "some updated name", password_hash: "some updated password_hash"}
-    @invalid_attrs %{email: nil, name: nil, password_hash: nil}
+    @valid_attrs %{
+      email: "foo@bar.com",
+      name: "Foo Bar",
+      password: "passwordHash",
+      password_confirmation: "passwordHash"
+    }
+    @update_attrs %{
+      email: "foo1@bar.com",
+      name: "Foo Bar 1",
+      password: "passwordHash",
+      password_confirmation: "passwordHash"
+    }
+    @invalid_attrs %{email: nil, name: nil, password: nil}
 
     def user_fixture(attrs \\ %{}) do
       {:ok, user} =
@@ -16,7 +26,7 @@ defmodule Stone.AccountsTest do
         |> Enum.into(@valid_attrs)
         |> Accounts.create_user()
 
-      user
+      %{user | password: nil, password_confirmation: nil}
     end
 
     test "list_users/0 returns all users" do
@@ -31,9 +41,9 @@ defmodule Stone.AccountsTest do
 
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
-      assert user.email == "some email"
-      assert user.name == "some name"
-      assert user.password_hash == "some password_hash"
+      assert user.email == @valid_attrs.email
+      assert user.name == @valid_attrs.name
+      assert Bcrypt.check_pass(user, @valid_attrs.password)
     end
 
     test "create_user/1 with invalid data returns error changeset" do
@@ -43,9 +53,9 @@ defmodule Stone.AccountsTest do
     test "update_user/2 with valid data updates the user" do
       user = user_fixture()
       assert {:ok, %User{} = user} = Accounts.update_user(user, @update_attrs)
-      assert user.email == "some updated email"
-      assert user.name == "some updated name"
-      assert user.password_hash == "some updated password_hash"
+      assert user.email == @update_attrs.email
+      assert user.name == @update_attrs.name
+      assert Bcrypt.check_pass(user, @update_attrs.password)
     end
 
     test "update_user/2 with invalid data returns error changeset" do
@@ -63,6 +73,27 @@ defmodule Stone.AccountsTest do
     test "change_user/1 returns a user changeset" do
       user = user_fixture()
       assert %Ecto.Changeset{} = Accounts.change_user(user)
+    end
+
+    test "user_sign_in/2 with valid data returns a jwt token" do
+      user_fixture()
+
+      assert {:ok, token, _claim} =
+               Accounts.user_sign_in(@valid_attrs.email, @valid_attrs.password)
+
+      assert String.match?(token, ~r/[A-Za-z0-9\-\._~\+\/]+=*/)
+    end
+
+    test "user_sign_in/2 with invalid password returns {:error, :unauthorized}" do
+      user_fixture()
+
+      assert {:error, :unauthorized} = Accounts.user_sign_in(@valid_attrs.email, "invalid_pass")
+    end
+
+    test "user_sign_in/2 with invalid email returns {:error, :unauthorized}" do
+      user_fixture()
+
+      assert {:error, :unauthorized} = Accounts.user_sign_in("bar@foo.com", @valid_attrs.password)
     end
   end
 end

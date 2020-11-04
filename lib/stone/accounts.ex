@@ -6,6 +6,7 @@ defmodule Stone.Accounts do
   import Ecto.Query, warn: false
   alias Stone.Repo
 
+  alias Stone.Guardian
   alias Stone.Accounts.User
 
   @doc """
@@ -100,5 +101,30 @@ defmodule Stone.Accounts do
   """
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
+  end
+
+  def user_sign_in(email, password) do
+    with {:ok, user} <- get_user_by_email(email),
+         {:ok, _} <- verify_password(user, password) do
+      Guardian.encode_and_sign(user)
+    else
+      _ ->
+        {:error, :unauthorized}
+    end
+  end
+
+  defp get_user_by_email(email) do
+    case Repo.get_by(User, email: email) do
+      nil -> nil
+      user -> {:ok, user}
+    end
+  end
+
+  defp verify_password(%User{} = user, password) do
+    case Bcrypt.check_pass(user, password) do
+      {:ok, user} -> {:ok, user}
+
+      _ -> :error
+    end
   end
 end

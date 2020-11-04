@@ -21,4 +21,10 @@ defmodule StoneWeb.FallbackController do
     |> put_view(StoneWeb.ErrorView)
     |> render(:"404")
   end
+
+  def call(conn, {:error, :unauthorized}) do
+    conn
+    |> put_status(:unauthorized)
+    |> json(%{error: "Falha de Autenticação"})
+  end
 end

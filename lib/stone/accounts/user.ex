@@ -9,8 +9,8 @@ defmodule Stone.Accounts.User do
     field :name, :string
     field :password_hash, :string
 
-    field :password, :string, virtal: true
-    field :password_confirmation, :string, virtal: true
+    field :password, :string, virtual: true
+    field :password_confirmation, :string, virtual: true
 
     timestamps()
   end
@@ -21,6 +21,8 @@ defmodule Stone.Accounts.User do
     user
     |> cast(attrs, @required_create_fields)
     |> validate_required(@required_create_fields)
+    |> validate_format(:email, ~r/@/, message: "Email inválido")
+    |> validate_length(:password, min: 6, message: "A senha deve ter um tamanho minimo de 6")
     |> validate_confirmation(:password, message: "As senhas não conferem")
     |> put_pass_hash()
     |> unique_constraint(:email)

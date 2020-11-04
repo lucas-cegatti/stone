@@ -11,9 +11,10 @@ defmodule StoneWeb.UserView do
   end
 
   def render("user.json", %{user: user}) do
-    %{id: user.id,
-      name: user.name,
-      password_hash: user.password_hash,
-      email: user.email}
+    %{id: user.id, name: user.name, email: user.email}
+  end
+
+  def render("jwt.json", %{jwt: jwt}) do
+    %{token: jwt}
   end
 end

@@ -15,7 +15,6 @@ defmodule StoneWeb.UserController do
     with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", Routes.user_path(conn, :show, user))
       |> render("show.json", user: user)
     end
   end
@@ -38,6 +37,16 @@ defmodule StoneWeb.UserController do
 
     with {:ok, %User{}} <- Accounts.delete_user(user) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  def sign_in(conn, %{"email" => email, "password" => password}) do
+    case Accounts.user_sign_in(email, password) do
+      {:ok, token, _claims} ->
+        render(conn, "jwt.json", %{jwt: token})
+
+      _ ->
+        {:error, :unauthorized}
     end
   end
 end
