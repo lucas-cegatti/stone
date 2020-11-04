@@ -5,11 +5,25 @@ defmodule StoneWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authenticated do
+    plug Guardian.Plug.Pipeline, module: Stone.Guardian, error_handler: StoneWeb.AuthErrorHandler
+
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
+    plug Guardian.Plug.EnsureAuthenticated
+    plug Guardian.Plug.LoadResource
+  end
+
   scope "/api/v1", StoneWeb do
     pipe_through :api
 
     post "/sign_up", UserController, :create
     post "/sign_in", UserController, :sign_in
+  end
+
+  scope "/api/v1", StoneWeb do
+    pipe_through [:api, :authenticated]
+
+    get "/self", UserController, :show
   end
 
   # Enables LiveDashboard only for development

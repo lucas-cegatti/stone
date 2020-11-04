@@ -108,6 +108,10 @@ defmodule Stone.Accounts do
          {:ok, _} <- verify_password(user, password) do
       Guardian.encode_and_sign(user)
     else
+      {:error, :user_not_found} ->
+        Bcrypt.no_user_verify()
+        {:error, :unauthorized}
+
       _ ->
         {:error, :unauthorized}
     end
@@ -115,15 +119,17 @@ defmodule Stone.Accounts do
 
   defp get_user_by_email(email) do
     case Repo.get_by(User, email: email) do
-      nil -> nil
-      user -> {:ok, user}
+      nil ->
+        {:error, :user_not_found}
+
+      user ->
+        {:ok, user}
     end
   end
 
   defp verify_password(%User{} = user, password) do
     case Bcrypt.check_pass(user, password) do
       {:ok, user} -> {:ok, user}
-
       _ -> :error
     end
   end
