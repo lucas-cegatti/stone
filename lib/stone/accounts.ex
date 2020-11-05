@@ -6,8 +6,9 @@ defmodule Stone.Accounts do
   import Ecto.Query, warn: false
   alias Stone.Repo
 
+  alias Ecto.Multi
   alias Stone.Guardian
-  alias Stone.Accounts.User
+  alias Stone.Accounts.{User, CheckingAccount}
 
   @doc """
   Returns the list of users.
@@ -54,6 +55,22 @@ defmodule Stone.Accounts do
     %User{}
     |> User.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def create_user_with_checking_account(attrs \\ %{}) do
+    Multi.new()
+    |> Multi.insert(:user, User.changeset(%User{}, attrs))
+    |> Multi.insert(:checking_account, fn %{user: user} ->
+      CheckingAccount.create_changeset(%{user_id: user.id, balance: 1_000})
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{user: user}} ->
+        {:ok, user}
+
+      {:error, _failed_operation, failed_value, _changes_so_far} ->
+        {:error, failed_value}
+    end
   end
 
   @doc """
@@ -132,5 +149,12 @@ defmodule Stone.Accounts do
       {:ok, user} -> {:ok, user}
       _ -> :error
     end
+  end
+
+  @spec transaction(atom(), integer(), Keyword.t()) :: []
+  def transaction(action, amount, opts \\ [])
+
+  def transaction(:withdraw, amount, opts) do
+    []
   end
 end

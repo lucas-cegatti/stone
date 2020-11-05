@@ -12,7 +12,7 @@ defmodule StoneWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
+    with {:ok, %User{} = user} <- Accounts.create_user_with_checking_account(user_params) do
       conn
       |> put_status(:created)
       |> render("show.json", user: user)

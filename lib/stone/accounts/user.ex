@@ -2,6 +2,8 @@ defmodule Stone.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Stone.Accounts.CheckingAccount
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
@@ -11,6 +13,8 @@ defmodule Stone.Accounts.User do
 
     field :password, :string, virtual: true
     field :password_confirmation, :string, virtual: true
+
+    has_one :checking_account, CheckingAccount
 
     timestamps()
   end
