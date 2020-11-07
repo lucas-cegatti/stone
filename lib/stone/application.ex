@@ -14,9 +14,10 @@ defmodule Stone.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Stone.PubSub},
       # Start the Endpoint (http/https)
-      StoneWeb.Endpoint
+      StoneWeb.Endpoint,
       # Start a worker by calling: Stone.Worker.start_link(arg)
       # {Stone.Worker, arg}
+      {Stone.Transactions.TransactionId, %{}}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

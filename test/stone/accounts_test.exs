@@ -95,5 +95,30 @@ defmodule Stone.AccountsTest do
 
       assert {:error, :unauthorized} = Accounts.user_sign_in("bar@foo.com", @valid_attrs.password)
     end
+
+    test "create_user_with_checking_account/1 with valid data creates user" do
+      assert {:ok, %User{} = user} = Accounts.create_user_with_checking_account(@valid_attrs)
+      assert user.email == @valid_attrs.email
+      assert user.name == @valid_attrs.name
+      assert Bcrypt.check_pass(user, @valid_attrs.password)
+    end
+
+    test "create_user_with_checking_account/1 with valid data creates user with account" do
+      assert {:ok, %User{} = user} = Accounts.create_user_with_checking_account(@valid_attrs)
+
+      assert user.checking_account
+      assert user.checking_account.number
+    end
+
+    test "create_user_with_checking_account/1 with valid data creates user account with 1_000 in balance " do
+      assert {:ok, %User{} = user} = Accounts.create_user_with_checking_account(@valid_attrs)
+
+      assert user.checking_account.balance == 1_000
+    end
+
+    test "create_user_with_checking_account/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} =
+               Accounts.create_user_with_checking_account(@invalid_attrs)
+    end
   end
 end

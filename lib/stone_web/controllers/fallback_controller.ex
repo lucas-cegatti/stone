@@ -6,6 +6,8 @@ defmodule StoneWeb.FallbackController do
   """
   use StoneWeb, :controller
 
+  alias Stone.Transactions.TransactionError
+
   # This clause handles errors returned by Ecto's insert/update/delete.
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
@@ -26,5 +28,12 @@ defmodule StoneWeb.FallbackController do
     conn
     |> put_status(:unauthorized)
     |> json(%{error: "Falha de Autenticação"})
+  end
+
+  def call(conn, %TransactionError{plug_status: plug_status} = error) do
+    conn
+    |> put_status(plug_status)
+    |> put_view(StoneWeb.ErrorView)
+    |> render("error.json", %{error: error})
   end
 end

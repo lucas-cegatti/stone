@@ -42,7 +42,7 @@ defmodule Stone.Accounts.CheckingAccount do
   end
 
   defp maybe_create_checking_account_number(
-         %Ecto.Changeset{valid?: true, changes: %{number: nil}} = changeset
+         %Ecto.Changeset{valid?: true} = changeset
        ) do
     change(changeset, %{number: create_checking_account_number()})
   end

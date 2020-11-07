@@ -66,6 +66,7 @@ defmodule Stone.Accounts do
     |> Repo.transaction()
     |> case do
       {:ok, %{user: user}} ->
+        user = Repo.preload(user, :checking_account)
         {:ok, user}
 
       {:error, _failed_operation, failed_value, _changes_so_far} ->

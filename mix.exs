@@ -45,7 +45,8 @@ defmodule Stone.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:bcrypt_elixir, "~> 2.0"},
       {:guardian, "~> 2.0"},
-      {:eapa, git: "https://github.com/Vonmo/eapa.git", tag: "v0.2.0"}
+      # {:eapa, git: "https://github.com/Vonmo/eapa.git", tag: "v0.2.0"},
+      {:decimal, "~> 2.0"}
     ]
   end
 
