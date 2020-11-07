@@ -145,7 +145,7 @@ defmodule Stone.Transactions do
         {:ok, decimal_amount},
         %CheckingAccount{} = checking_account
       ) do
-    current_balance = Decimal.new(checking_account.balance)
+    current_balance = Decimal.from_float(checking_account.balance)
     new_balance = Decimal.sub(current_balance, decimal_amount)
 
     case Decimal.lt?(new_balance, @zero) do

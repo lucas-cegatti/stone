@@ -152,10 +152,7 @@ defmodule Stone.Accounts do
     end
   end
 
-  @spec transaction(atom(), integer(), Keyword.t()) :: []
-  def transaction(action, amount, opts \\ [])
-
-  def transaction(:withdraw, amount, opts) do
-    []
+  def get_checking_acount_by_id(checking_account_id) do
+    Repo.get(CheckingAccount, checking_account_id)
   end
 end
