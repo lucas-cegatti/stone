@@ -3,22 +3,22 @@ defmodule Stone.Accounts.CheckingAccount do
   import Ecto.Changeset
 
   alias Stone.Accounts.User
-  alias Stone.Transactions.Transaction
+  alias Stone.Transactions.LedgerEvent
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "checking_accounts" do
-    field :balance, :float
+    field :balance, :integer
     field :number, :string
 
     belongs_to :user, User
 
-    has_many :transactions, Transaction
+    has_many :ledger_events, LedgerEvent
 
     timestamps()
   end
 
-  @required_create_fields ~w(balance user_id)a
+  @required_create_fields ~w(user_id)a
 
   @required_update_fields ~w(balance)a
 

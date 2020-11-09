@@ -8,6 +8,7 @@ defmodule Stone.Accounts do
 
   alias Ecto.Multi
   alias Stone.Guardian
+  alias Stone.Transactions.Ledgers
   alias Stone.Accounts.{User, CheckingAccount}
 
   @doc """
@@ -61,12 +62,16 @@ defmodule Stone.Accounts do
     Multi.new()
     |> Multi.insert(:user, User.changeset(%User{}, attrs))
     |> Multi.insert(:checking_account, fn %{user: user} ->
-      CheckingAccount.create_changeset(%{user_id: user.id, balance: 1_000})
+      CheckingAccount.create_changeset(%{user_id: user.id})
     end)
     |> Repo.transaction()
     |> case do
-      {:ok, %{user: user}} ->
+      {:ok, %{user: user, checking_account: checking_account}} ->
+
+        Ledgers.initial_credit(checking_account)
+
         user = Repo.preload(user, :checking_account)
+
         {:ok, user}
 
       {:error, _failed_operation, failed_value, _changes_so_far} ->

@@ -113,7 +113,7 @@ defmodule Stone.AccountsTest do
     test "create_user_with_checking_account/1 with valid data creates user account with 1_000 in balance " do
       assert {:ok, %User{} = user} = Accounts.create_user_with_checking_account(@valid_attrs)
 
-      assert user.checking_account.balance == 1_000
+      assert user.checking_account.balance == 100_000
     end
 
     test "create_user_with_checking_account/1 with invalid data returns error changeset" do

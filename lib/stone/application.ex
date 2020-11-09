@@ -17,7 +17,9 @@ defmodule Stone.Application do
       StoneWeb.Endpoint,
       # Start a worker by calling: Stone.Worker.start_link(arg)
       # {Stone.Worker, arg}
-      {Stone.Transactions.TransactionId, %{}}
+      {Stone.Transactions.TransactionId, %{}},
+
+      {Stone.Transactions.Ledgers, %{}}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -5,7 +5,7 @@ defmodule Stone.Repo.Migrations.CreateCheckingAccounts do
     create table(:checking_accounts, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :number, :string
-      add :balance, :float
+      add :balance, :bigint
       add :user_id, references(:users, on_delete: :nothing, type: :binary_id)
 
       timestamps()

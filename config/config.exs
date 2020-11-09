@@ -32,6 +32,9 @@ config :stone, Stone.Guardian,
   issuer: "stone",
   secret_key: "Wqw/rT0faU2jrib9S1y/GiXy3iBSTmZHwIkJR7sR3YsWGt3BwfR6UOfbI9Ollrq8"
 
+config :money,
+  default_currency: :BRL
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

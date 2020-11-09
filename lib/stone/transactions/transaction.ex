@@ -7,7 +7,7 @@ defmodule Stone.Transactions.Transaction do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "transactions" do
-    field :amount, :float
+    field :amount, :integer
     field :destination, :string
     field :type, Ecto.Enum, values: [:withdrawal, :transfer]
 
