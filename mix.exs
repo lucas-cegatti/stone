@@ -45,7 +45,8 @@ defmodule Stone.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:bcrypt_elixir, "~> 2.0"},
       {:guardian, "~> 2.0"},
-      {:money, "~> 1.4"}
+      {:money, "~> 1.4"},
+      {:stream_data, "~> 0.1", only: :test}
     ]
   end
 

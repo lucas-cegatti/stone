@@ -120,5 +120,16 @@ defmodule Stone.AccountsTest do
       assert {:error, %Ecto.Changeset{}} =
                Accounts.create_user_with_checking_account(@invalid_attrs)
     end
+
+    test "create_user_with_checking_account/1 with valid data add 1 ledger event of credit" do
+      assert {:ok, %User{} = user} = Accounts.create_user_with_checking_account(@valid_attrs)
+
+      assert user.checking_account.balance == 100_000
+      assert [ledger_event | []] = user.checking_account.ledger_events
+
+      assert ledger_event.type == :credit
+      assert ledger_event.amount == 100_000
+      assert ledger_event.number == 1
+    end
   end
 end

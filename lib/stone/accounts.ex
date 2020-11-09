@@ -67,10 +67,9 @@ defmodule Stone.Accounts do
     |> Repo.transaction()
     |> case do
       {:ok, %{user: user, checking_account: checking_account}} ->
-
         Ledgers.initial_credit(checking_account)
 
-        user = Repo.preload(user, :checking_account)
+        user = Repo.preload(user, checking_account: :ledger_events)
 
         {:ok, user}
 
@@ -158,6 +157,6 @@ defmodule Stone.Accounts do
   end
 
   def get_checking_acount_by_id(checking_account_id) do
-    Repo.get(CheckingAccount, checking_account_id)
+    Repo.get(CheckingAccount, checking_account_id) |> Repo.preload(:ledger_events)
   end
 end

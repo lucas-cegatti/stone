@@ -27,7 +27,7 @@ defmodule Stone.Transactions.TransactionError do
     %__MODULE__{
       code: "T0003",
       message:
-        "Invalid Transaction Amount is Leading do Negative Balance. Amount: #{amount} / Current Balance: #{
+        "Invalid Transaction Amount is Leading to Negative Balance. Amount: #{amount} / Current Balance: #{
           balance
         }",
         plug_status: 422

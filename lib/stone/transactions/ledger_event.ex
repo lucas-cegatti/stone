@@ -21,7 +21,7 @@ defmodule Stone.Transactions.LedgerEvent do
   @doc false
   def changeset(ledger, attrs) do
     ledger
-    |> cast(attrs, [:amount, :type, :description, :event_date])
-    |> validate_required([:amount, :type, :description, :event_date])
+    |> cast(attrs, [:amount, :type, :description, :event_date, :checking_account_id])
+    |> validate_required([:amount, :type, :description, :event_date, :checking_account_id])
   end
 end

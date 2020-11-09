@@ -17,7 +17,8 @@ defmodule Stone.Transactions.Ledgers do
       description: "Withdrawal from checking account",
       type: :debit,
       checking_account_id: checking_account.id,
-      event_date: DateTime.utc_now()
+      event_date: DateTime.utc_now(),
+      number: 0
     }
 
     GenServer.call(@name, {:debit, ledger, checking_account})
@@ -33,16 +34,21 @@ defmodule Stone.Transactions.Ledgers do
       description: "Transfered to #{destination_checking_account.number}",
       type: :debit,
       checking_account_id: checking_account.id,
-      event_date: DateTime.utc_now()
+      event_date: DateTime.utc_now(),
+      number: 0
     }
 
     credit_ledger = %{
       amount: amount,
       description: "Received from #{checking_account.number}",
-      type: :debit,
+      type: :credit,
       checking_account_id: destination_checking_account.id,
-      event_date: DateTime.utc_now()
+      event_date: DateTime.utc_now(),
+      number: 0
     }
+
+    GenServer.call(@name, {:debit, debit_ledger, checking_account})
+    GenServer.call(@name, {:credit, credit_ledger, destination_checking_account})
   end
 
   def initial_credit(%CheckingAccount{} = checking_account) do
@@ -51,7 +57,8 @@ defmodule Stone.Transactions.Ledgers do
       description: "Initial Credit For Opening Account :)",
       type: :credit,
       checking_account_id: checking_account.id,
-      event_date: DateTime.utc_now()
+      event_date: DateTime.utc_now(),
+      number: 0
     }
 
     GenServer.call(@name, {:credit, ledger_event, checking_account})

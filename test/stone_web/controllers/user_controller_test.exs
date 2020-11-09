@@ -91,7 +91,7 @@ defmodule StoneWeb.UserControllerTest do
   describe "sign_in" do
     setup [:create_user]
 
-    test "signing in user with valida data returns a valid token", %{
+    test "signing in user with valid data returns a valid token", %{
       conn: conn,
       user: %User{email: email, password: password}
     } do

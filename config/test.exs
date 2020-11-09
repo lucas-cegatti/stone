@@ -22,3 +22,6 @@ config :stone, StoneWeb.Endpoint,
 config :logger, level: :warn
 
 config :bcrypt_elixir, :log_rounds, 4
+
+config :stream_data,
+  max_runs: 50

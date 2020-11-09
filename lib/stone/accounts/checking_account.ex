@@ -5,6 +5,11 @@ defmodule Stone.Accounts.CheckingAccount do
   alias Stone.Accounts.User
   alias Stone.Transactions.LedgerEvent
 
+  @type t() :: %__MODULE__{
+    balance: integer(),
+    number: String.t()
+  }
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "checking_accounts" do
