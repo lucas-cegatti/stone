@@ -34,11 +34,6 @@ defmodule Stone.AccountsTest do
       assert Accounts.list_users() == [user]
     end
 
-    test "get_user!/1 returns the user with given id" do
-      user = user_fixture()
-      assert Accounts.get_user!(user.id) == user
-    end
-
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
       assert user.email == @valid_attrs.email
@@ -56,12 +51,6 @@ defmodule Stone.AccountsTest do
       assert user.email == @update_attrs.email
       assert user.name == @update_attrs.name
       assert Bcrypt.check_pass(user, @update_attrs.password)
-    end
-
-    test "update_user/2 with invalid data returns error changeset" do
-      user = user_fixture()
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_user(user, @invalid_attrs)
-      assert user == Accounts.get_user!(user.id)
     end
 
     test "delete_user/1 deletes the user" do

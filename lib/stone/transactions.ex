@@ -40,7 +40,9 @@ defmodule Stone.Transactions do
     do: TransactionError.invalid_transaction_account_number("not found")
 
   @spec withdrawal(integer, Stone.Accounts.CheckingAccount.t(), String.t()) ::
-          {:ok} | TransactionError.t()
+          {:ok, Stone.Transactions.LedgerEvent.t()}
+          | TransactionError.t()
+          | {:error, Ecto.Changeset.t()}
   def withdrawal(amount, %CheckingAccount{} = checking_account, transaction_id) do
     case TransactionId.take(transaction_id) do
       {:ok, _opts} -> Ledgers.withdrawal(amount, checking_account)
@@ -73,6 +75,24 @@ defmodule Stone.Transactions do
   def transfer(_amount, _checking_account, nil, _transaction_id),
     do: TransactionError.invalid_transaction_account_number("not found")
 
+  def transfer(
+        _amount,
+        %CheckingAccount{id: from_id},
+        %CheckingAccount{id: to_id},
+        _transaction_id
+      )
+      when from_id == to_id,
+      do: TransactionError.invalid_transaction_transfer_same_destination_account()
+
+  @spec transfer(
+          integer,
+          Stone.Accounts.CheckingAccount.t(),
+          Stone.Accounts.CheckingAccount.t(),
+          String.t()
+        ) ::
+          {:ok, Stone.Transactions.LedgerEvent.t()}
+          | TransactionError.t()
+          | {:error, Ecto.Changeset.t()}
   def transfer(
         amount,
         %CheckingAccount{} = checking_account,

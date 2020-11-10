@@ -33,7 +33,7 @@ defmodule StoneWeb.FallbackController do
   def call(conn, %TransactionError{plug_status: plug_status} = error) do
     conn
     |> put_status(plug_status)
-    |> put_view(StoneWeb.ErrorView)
+    |> put_view(StoneWeb.TransactionView)
     |> render("error.json", %{error: error})
   end
 end

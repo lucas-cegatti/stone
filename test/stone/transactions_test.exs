@@ -4,8 +4,7 @@ defmodule Stone.TransactionsTest do
 
   alias Stone.Accounts
   alias Stone.Transactions
-  alias Stone.Accounts.CheckingAccount
-  alias Stone.Transactions.TransactionError
+  alias Stone.Transactions.{TransactionError, LedgerEvent}
 
   describe "transactions withdrawal" do
     setup :setup_checking_account
@@ -15,7 +14,7 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %CheckingAccount{} = checking_account} =
+      assert {:ok, %LedgerEvent{} = ledger_event} =
                Transactions.withdrawal(1000, checking_account, transaction_id)
     end
 
@@ -24,8 +23,10 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %CheckingAccount{} = checking_account} =
+      assert {:ok, %LedgerEvent{} = ledger_event} =
                Transactions.withdrawal(1000, checking_account, transaction_id)
+
+      checking_account = Accounts.get_checking_acount_by_id(checking_account.id)
 
       assert checking_account.balance == 100_000 - 1000
     end
@@ -36,7 +37,7 @@ defmodule Stone.TransactionsTest do
          } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %CheckingAccount{} = checking_account} =
+      assert {:ok, %LedgerEvent{} = ledger_event} =
                Transactions.withdrawal(1000, checking_account, transaction_id)
 
       checking_account = Accounts.get_checking_acount_by_id(checking_account.id)
@@ -50,15 +51,15 @@ defmodule Stone.TransactionsTest do
          } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %CheckingAccount{} = checking_account} =
+      assert {:ok, %LedgerEvent{} = response_ledger_event} =
                Transactions.withdrawal(1000, checking_account, transaction_id)
 
       checking_account = Accounts.get_checking_acount_by_id(checking_account.id)
 
       ledger_event = List.first(checking_account.ledger_events)
 
-      assert ledger_event.type == :debit
-      assert ledger_event.amount == 1000
+      assert ledger_event.type == response_ledger_event.type
+      assert ledger_event.amount == response_ledger_event.amount
     end
 
     test "withdrawal/2 should not accept negative values as amount",
@@ -114,8 +115,8 @@ defmodule Stone.TransactionsTest do
                 StreamData.constant(Transactions.get_transaction_id_for_checking_account()),
               max_runs: 30
             ) do
-        assert assert {:ok, %CheckingAccount{} = checking_account} =
-                        Transactions.withdrawal(amount, checking_account, transaction_id)
+        assert {:ok, %LedgerEvent{} = ledger_event} =
+                 Transactions.withdrawal(amount, checking_account, transaction_id)
       end
 
       checking_account = Accounts.get_checking_acount_by_id(checking_account.id)
@@ -145,7 +146,7 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %CheckingAccount{} = checking_account} =
+      assert {:ok, %LedgerEvent{} = ledger_event} =
                Transactions.transfer(
                  100,
                  checking_account,
@@ -154,13 +155,13 @@ defmodule Stone.TransactionsTest do
                )
     end
 
-    test "transfer/4 with valid data should return the debit checking account at the response", %{
+    test "transfer/4 with valid data should return the debit ledger event at the response", %{
       checking_account: checking_account,
       second_checking_account: second_checking_account
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %CheckingAccount{} = response_checking_account} =
+      assert {:ok, %LedgerEvent{} = ledger_event} =
                Transactions.transfer(
                  100,
                  checking_account,
@@ -168,7 +169,8 @@ defmodule Stone.TransactionsTest do
                  transaction_id
                )
 
-      assert response_checking_account.id == checking_account.id
+      assert ledger_event.checking_account_id == checking_account.id
+      assert ledger_event.type == :debit
     end
 
     test "transfer/4 with valid data should debit the source account", %{
@@ -178,7 +180,7 @@ defmodule Stone.TransactionsTest do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
       old_balance = checking_account.balance
 
-      assert {:ok, %CheckingAccount{} = response_checking_account} =
+      assert {:ok, %LedgerEvent{} = ledger_event} =
                Transactions.transfer(
                  100,
                  checking_account,
@@ -186,6 +188,7 @@ defmodule Stone.TransactionsTest do
                  transaction_id
                )
 
+      response_checking_account = Accounts.get_checking_acount_by_id(checking_account.id)
       assert response_checking_account.balance == old_balance - 100
     end
 
@@ -196,7 +199,7 @@ defmodule Stone.TransactionsTest do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
       old_balance = second_checking_account.balance
 
-      assert {:ok, %CheckingAccount{} = response_checking_account} =
+      assert {:ok, %LedgerEvent{} = ledger_event} =
                Transactions.transfer(
                  100,
                  checking_account,
@@ -214,7 +217,7 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %CheckingAccount{} = response_checking_account} =
+      assert {:ok, %LedgerEvent{} = ledger_event} =
                Transactions.transfer(
                  100,
                  checking_account,
@@ -222,7 +225,7 @@ defmodule Stone.TransactionsTest do
                  transaction_id
                )
 
-      response_checking_account = Accounts.get_checking_acount_by_id(response_checking_account.id)
+      response_checking_account = Accounts.get_checking_acount_by_id(ledger_event.checking_account_id)
       debit_ledger = List.first(response_checking_account.ledger_events)
 
       assert debit_ledger.type == :debit
@@ -235,7 +238,7 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %CheckingAccount{} = response_checking_account} =
+      assert {:ok, %LedgerEvent{} = ledger_event} =
                Transactions.transfer(
                  100,
                  checking_account,
@@ -392,13 +395,13 @@ defmodule Stone.TransactionsTest do
                 StreamData.constant(Transactions.get_transaction_id_for_checking_account()),
               max_runs: 30
             ) do
-        assert {:ok, %CheckingAccount{} = checking_account} =
-                        Transactions.transfer(
-                          amount,
-                          checking_account,
-                          second_checking_account,
-                          transaction_id
-                        )
+        assert {:ok, %LedgerEvent{} = ledger_event} =
+                 Transactions.transfer(
+                   amount,
+                   checking_account,
+                   second_checking_account,
+                   transaction_id
+                 )
       end
 
       checking_account = Accounts.get_checking_acount_by_id(checking_account.id)

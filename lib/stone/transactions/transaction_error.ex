@@ -50,4 +50,12 @@ defmodule Stone.Transactions.TransactionError do
       plug_status: 422
     }
   end
+
+  def invalid_transaction_transfer_same_destination_account() do
+    %__MODULE__{
+      code: "T0006",
+      message: "Invalid transaction transfer, cannot transfer to self.",
+      plug_status: 422
+    }
+  end
 end

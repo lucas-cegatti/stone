@@ -97,7 +97,7 @@ defmodule Stone.Transactions.Ledgers do
               initial_ledger()
             )},
          resulting_balance <- current_state.balance + ledger_event.amount,
-         {:ok, db_ledger_event, db_checking_account} <-
+         {:ok, db_ledger_event, _db_checking_account} <-
            save_db_state(ledger_event, checking_account, resulting_balance) do
       resulting_state = %{
         current_state
@@ -106,7 +106,7 @@ defmodule Stone.Transactions.Ledgers do
       }
 
       reply(
-        {:ok, db_checking_account},
+        {:ok, db_ledger_event},
         Map.put(ledgers, checking_account.number, resulting_state)
       )
     else
@@ -126,7 +126,7 @@ defmodule Stone.Transactions.Ledgers do
          resulting_balance <- current_state.balance - ledger_event.amount,
          {:balance, true, _current_balance} <-
            {:balance, resulting_balance >= 0, current_state.balance},
-         {:ok, db_ledger_event, db_checking_account} <-
+         {:ok, db_ledger_event, _db_checking_account} <-
            save_db_state(ledger_event, checking_account, resulting_balance) do
       resulting_state = %{
         current_state
@@ -135,7 +135,7 @@ defmodule Stone.Transactions.Ledgers do
       }
 
       reply(
-        {:ok, db_checking_account},
+        {:ok, db_ledger_event},
         Map.put(ledgers, checking_account.number, resulting_state)
       )
     else

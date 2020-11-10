@@ -26,6 +26,7 @@ defmodule StoneWeb.Router do
     get "/self", UserController, :show
 
     post "/withdrawal", TransactionController, :withdrawal
+    post "/transfer", TransactionController, :transfer
   end
 
   # Enables LiveDashboard only for development
