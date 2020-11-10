@@ -18,7 +18,6 @@ defmodule Stone.Application do
       # Start a worker by calling: Stone.Worker.start_link(arg)
       # {Stone.Worker, arg}
       {Stone.Transactions.TransactionId, %{}},
-
       {Stone.Transactions.Ledgers, %{}}
     ]
 

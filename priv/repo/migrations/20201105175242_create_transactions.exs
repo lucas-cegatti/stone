@@ -7,7 +7,9 @@ defmodule Stone.Repo.Migrations.CreateTransactions do
       add :amount, :integer
       add :type, :string
       add :destination, :string
-      add :checking_account_id, references(:checking_accounts, on_delete: :nothing, type: :binary_id)
+
+      add :checking_account_id,
+          references(:checking_accounts, on_delete: :nothing, type: :binary_id)
 
       timestamps()
     end

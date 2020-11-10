@@ -38,7 +38,7 @@ defmodule Stone.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id), do: Repo.get!(User, id, preload: :checking_account)
 
   @doc """
   Creates a user.
@@ -158,5 +158,9 @@ defmodule Stone.Accounts do
 
   def get_checking_acount_by_id(checking_account_id) do
     Repo.get(CheckingAccount, checking_account_id) |> Repo.preload(:ledger_events)
+  end
+
+  def get_checking_account_by_number(account_number) do
+    Repo.get_by(CheckingAccount, number: account_number, preload: :ledger_events)
   end
 end

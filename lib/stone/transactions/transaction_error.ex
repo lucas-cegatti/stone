@@ -18,7 +18,8 @@ defmodule Stone.Transactions.TransactionError do
   def invalid_transaction_amount(amount) do
     %__MODULE__{
       code: "T0002",
-      message: "Invalid Transaction Amount given #{amount}. Check if the parameter is of integer type.",
+      message:
+        "Invalid Transaction Amount given #{amount}. Check if the parameter is of integer type.",
       plug_status: 422
     }
   end
@@ -30,25 +31,23 @@ defmodule Stone.Transactions.TransactionError do
         "Invalid Transaction Amount is Leading to Negative Balance. Amount: #{amount} / Current Balance: #{
           balance
         }",
-        plug_status: 422
+      plug_status: 422
     }
   end
 
   def invalid_transaction_account_number(account_number) do
     %__MODULE__{
       code: "T0004",
-      message:
-        "Invalid account number given #{account_number}",
-        plug_status: 422
+      message: "Invalid account number given #{account_number}",
+      plug_status: 422
     }
   end
 
   def invalid_transaction_amount_negative_integer(amount) do
     %__MODULE__{
       code: "T0005",
-      message:
-        "Invalid transaction amount, must be a positive integer, given amount #{amount}",
-        plug_status: 422
+      message: "Invalid transaction amount, must be a positive integer, given amount #{amount}",
+      plug_status: 422
     }
   end
 end

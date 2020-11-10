@@ -11,9 +11,11 @@ defmodule StoneWeb.TransactionView do
   end
 
   def render("transaction.json", %{transaction: transaction}) do
-    %{id: transaction.id,
+    %{
+      id: transaction.id,
       amount: transaction.amount,
       type: transaction.type,
-      destination: transaction.destination}
+      destination: transaction.destination
+    }
   end
 end

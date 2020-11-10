@@ -10,7 +10,8 @@ defmodule Stone.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
@@ -46,7 +47,11 @@ defmodule Stone.MixProject do
       {:bcrypt_elixir, "~> 2.0"},
       {:guardian, "~> 2.0"},
       {:money, "~> 1.4"},
-      {:stream_data, "~> 0.1", only: :test}
+
+      # Test libraries
+      {:stream_data, "~> 0.1", only: :test},
+      {:excoveralls, "~> 0.10", only: :test},
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
     ]
   end
 

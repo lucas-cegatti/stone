@@ -6,9 +6,9 @@ defmodule Stone.Accounts.CheckingAccount do
   alias Stone.Transactions.LedgerEvent
 
   @type t() :: %__MODULE__{
-    balance: integer(),
-    number: String.t()
-  }
+          balance: integer(),
+          number: String.t()
+        }
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -46,9 +46,7 @@ defmodule Stone.Accounts.CheckingAccount do
     :io_lib.format("~8..0B", [:rand.uniform(100_000_000) - 1]) |> List.to_string()
   end
 
-  defp maybe_create_checking_account_number(
-         %Ecto.Changeset{valid?: true} = changeset
-       ) do
+  defp maybe_create_checking_account_number(%Ecto.Changeset{valid?: true} = changeset) do
     change(changeset, %{number: create_checking_account_number()})
   end
 

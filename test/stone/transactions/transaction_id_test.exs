@@ -18,11 +18,11 @@ defmodule Stone.Transactions.TransactionIdTest do
 
       assert {:ok, []} = TransactionId.take(transaction_id)
 
-      assert {:error, :not_found} = TransactionId.take(transaction_id)
+      assert {:error, :not_found, transaction_id} = TransactionId.take(transaction_id)
     end
 
     test "taks/1 with a random uuid should return error not found" do
-      assert {:error, :not_found} = TransactionId.take(Ecto.UUID.generate)
+      assert {:error, :not_found, transaction_id} = TransactionId.take(Ecto.UUID.generate())
     end
   end
 end

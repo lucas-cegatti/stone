@@ -24,6 +24,8 @@ defmodule StoneWeb.Router do
     pipe_through [:api, :authenticated]
 
     get "/self", UserController, :show
+
+    post "/withdrawal", TransactionController, :withdrawal
   end
 
   # Enables LiveDashboard only for development

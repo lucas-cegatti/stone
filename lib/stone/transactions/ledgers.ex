@@ -11,6 +11,11 @@ defmodule Stone.Transactions.Ledgers do
     GenServer.start_link(__MODULE__, default, name: @name)
   end
 
+  @doc """
+  Sends a call to this Server to make a withdrawal operation on the given account using the given amount.
+
+  This will send a :debit operation to the server
+  """
   def withdrawal(amount, %CheckingAccount{} = checking_account) do
     ledger = %{
       amount: amount,
@@ -47,13 +52,22 @@ defmodule Stone.Transactions.Ledgers do
       number: 0
     }
 
-    GenServer.call(@name, {:debit, debit_ledger, checking_account})
-    GenServer.call(@name, {:credit, credit_ledger, destination_checking_account})
+    with {:ok, debit_checking_account} <-
+           GenServer.call(@name, {:debit, debit_ledger, checking_account}),
+         {:ok, _credit_checking_account} <-
+           GenServer.call(@name, {:credit, credit_ledger, destination_checking_account}) do
+      {:ok, debit_checking_account}
+    else
+      error -> error
+    end
   end
 
+  @doc """
+  Sends a credit operation to add 1_000 funds to the newly created account.
+  """
   def initial_credit(%CheckingAccount{} = checking_account) do
     ledger_event = %{
-      amount: 100000,
+      amount: 100_000,
       description: "Initial Credit For Opening Account :)",
       type: :credit,
       checking_account_id: checking_account.id,
@@ -143,6 +157,9 @@ defmodule Stone.Transactions.Ledgers do
       {:error, changeset} ->
         {:error, changeset}
     end
+  end
+
+  def handle_cast({:group_data, account_number}, _from, ledgers) do
   end
 
   defp reply(response, state) do

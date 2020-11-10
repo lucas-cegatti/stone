@@ -9,7 +9,9 @@ defmodule Stone.Repo.Migrations.CreateLedgers do
       add :type, :string
       add :description, :string
       add :event_date, :utc_datetime
-      add :checking_account_id, references(:checking_accounts, on_delete: :nothing, type: :binary_id)
+
+      add :checking_account_id,
+          references(:checking_accounts, on_delete: :nothing, type: :binary_id)
 
       timestamps()
     end
