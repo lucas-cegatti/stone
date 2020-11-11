@@ -73,7 +73,7 @@ COPY rsa_keys ./rsa_keys
 
 # Copy over the build artifact from the previous step
 COPY --from=app_builder /app/_build .
-RUN ln -s ${ENV}/rel/framework _release
+RUN ln -s ${ENV}/rel/stone _release
 
 EXPOSE 4000
 

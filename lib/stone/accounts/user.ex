@@ -25,9 +25,9 @@ defmodule Stone.Accounts.User do
     user
     |> cast(attrs, @required_create_fields)
     |> validate_required(@required_create_fields)
-    |> validate_format(:email, ~r/@/, message: "Email inválido")
-    |> validate_length(:password, min: 6, message: "A senha deve ter um tamanho minimo de 6")
-    |> validate_confirmation(:password, message: "As senhas não conferem")
+    |> validate_format(:email, ~r/@/, message: "Invalid Email")
+    |> validate_length(:password, min: 6, message: "Minimum password length is 6")
+    |> validate_confirmation(:password, message: "Passwords do not match")
     |> put_pass_hash()
     |> unique_constraint(:email)
   end

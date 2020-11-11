@@ -1,11 +1,16 @@
 defmodule Stone.Transactions.Ledgers do
+  @moduledoc """
+  Ledgers Module is used to store the checking accounts ledger state into a Gen Stage.
+
+  This module will update its own GenStage state as well as the database state.
+  """
   use GenServer
 
   @name CheckingAccountLedgers
 
   alias Stone.Repo
   alias Stone.Accounts.CheckingAccount
-  alias Stone.Transactions.{LedgerEvent, TransactionError}
+  alias Stone.Transactions.{LedgerEvent, TransactionError, LedgerState}
 
   def start_link(default \\ %{}) do
     GenServer.start_link(__MODULE__, default, name: @name)
@@ -26,9 +31,21 @@ defmodule Stone.Transactions.Ledgers do
       number: 0
     }
 
-    GenServer.call(@name, {:debit, ledger, checking_account})
+    case GenServer.call(@name, {:debit, ledger, checking_account}) do
+      {:ok, response} ->
+        GenServer.cast(@name, {:update_ledger_state, checking_account.number})
+        {:ok, response}
+
+      error ->
+        error
+    end
   end
 
+  @doc """
+  Sends a call to this Server to make a transfer operation sending it to the given destination account.
+
+  This will send both :debit (source account) and :credit (destination account) operations.
+  """
   def transfer(
         amount,
         %CheckingAccount{} = checking_account,
@@ -56,6 +73,9 @@ defmodule Stone.Transactions.Ledgers do
            GenServer.call(@name, {:debit, debit_ledger, checking_account}),
          {:ok, _credit_checking_account} <-
            GenServer.call(@name, {:credit, credit_ledger, destination_checking_account}) do
+      GenServer.cast(@name, {:update_ledger_state, checking_account.number})
+      GenServer.cast(@name, {:update_ledger_state, destination_checking_account.number})
+
       {:ok, debit_checking_account}
     else
       error -> error
@@ -75,7 +95,15 @@ defmodule Stone.Transactions.Ledgers do
       number: 0
     }
 
-    GenServer.call(@name, {:credit, ledger_event, checking_account})
+    case GenServer.call(@name, {:credit, ledger_event, checking_account}) do
+      {:ok, response} ->
+        GenServer.cast(@name, {:update_ledger_state, checking_account.number})
+
+        {:ok, response}
+
+      error ->
+        error
+    end
   end
 
   @impl true
@@ -159,7 +187,105 @@ defmodule Stone.Transactions.Ledgers do
     end
   end
 
-  def handle_cast({:group_data, account_number}, _from, ledgers) do
+  @doc """
+  A call to this cast will update the current ledger state.
+  The ledger state has its balance and totals grouped by day where each ledger event of that day is grouped in a list as well.
+  """
+  @impl true
+  def handle_cast({:update_ledger_state, account_number}, ledgers) do
+    ledgers =
+      Map.update(ledgers, account_number, %LedgerState{}, fn ledger_state = %LedgerState{} ->
+        ledger_state.ledger_events
+        |> group_ledger_events_by_day()
+        |> reduce_and_calculate_total_by_day()
+        |> update_current_state(ledger_state)
+      end)
+
+    {:noreply, ledgers}
+  end
+
+  defp group_ledger_events_by_day(ledger_events) do
+    Enum.group_by(ledger_events, &DateTime.to_date(&1.event_date))
+  end
+
+  _doc = """
+  Reduces the given ledger events and add to the following totals:
+  `Total of Credits` if there's any event of type :credit
+  `Total of Debits` if there's any event of type :debit
+  `Total` the total of all transactions both credit and debit
+  """
+
+  defp reduce_and_calculate_total_by_day(grouped_data) do
+    Enum.map(grouped_data, fn {date, ledger_events} ->
+      ledger_balance =
+        Enum.reduce(
+          ledger_events,
+          %{total_credits: 0, total_debits: 0, total: 0},
+          fn %LedgerEvent{} = ledger_event,
+             %{total_credits: total_credits, total_debits: total_debits, total: total} = balance ->
+            balance =
+              case ledger_event.type do
+                :credit ->
+                  %{balance | total_credits: total_credits + ledger_event.amount}
+
+                :debit ->
+                  %{balance | total_debits: total_debits + ledger_event.amount}
+              end
+
+            %{balance | total: total + ledger_event.amount}
+          end
+        )
+
+      {date, ledger_balance, ledger_events}
+    end)
+  end
+
+  _doc = """
+  Updates the current ledger state by adding the given ledger balances grouped by day.
+  It will always check for the current day at the first position of the list and won't go a full list scan
+  """
+
+  defp update_current_state(ledger_balances_by_day, %LedgerState{} = ledger_state) do
+    ledger_balances =
+      case ledger_state.ledger_balances do
+        [] ->
+          ledger_balances_by_day
+
+        ledger_balances ->
+          Enum.reduce(ledger_balances_by_day, ledger_balances, fn ledger_balance,
+                                                                  ledger_balances ->
+            [{current_date, current_ledger_balance, current_ledger_events} | _tail] =
+              ledger_balances
+
+            {grouped_date, grouped_ledger_balance, grouped_ledger_events} = ledger_balance
+
+            case current_date == grouped_date do
+              true ->
+                total_credits =
+                  current_ledger_balance.total_credits + grouped_ledger_balance.total_credits
+
+                total_debits =
+                  current_ledger_balance.total_debits + grouped_ledger_balance.total_debits
+
+                total = current_ledger_balance.total + grouped_ledger_balance.total
+
+                new_balance =
+                  {current_date,
+                   %{
+                     total_credits: total_credits,
+                     total_debits: total_debits,
+                     total: total
+                   }, grouped_ledger_events ++ current_ledger_events}
+
+                List.replace_at(ledger_balances, 0, new_balance)
+
+              false ->
+                [ledger_balance | ledger_balances]
+            end
+          end)
+      end
+
+    %LedgerState{ledger_state | ledger_balances: ledger_balances, ledger_events: []}
   end
 
   defp reply(response, state) do
@@ -167,7 +293,7 @@ defmodule Stone.Transactions.Ledgers do
   end
 
   defp initial_ledger() do
-    %{balance: 0, ledger_events: []}
+    %LedgerState{balance: 0, ledger_events: []}
   end
 
   defp save_db_state(ledger_event, %CheckingAccount{} = checking_account, resulting_balance) do
