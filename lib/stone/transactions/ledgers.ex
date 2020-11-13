@@ -21,13 +21,15 @@ defmodule Stone.Transactions.Ledgers do
 
   This will send a :debit operation to the server
   """
-  def withdrawal(amount, %CheckingAccount{} = checking_account) do
+  def withdrawal(amount, %CheckingAccount{} = checking_account, opts \\ []) do
+    event_date = Keyword.get(opts, :event_date, DateTime.utc_now())
+
     ledger = %{
       amount: amount,
       description: "Withdrawal from checking account",
       type: :debit,
       checking_account_id: checking_account.id,
-      event_date: DateTime.utc_now(),
+      event_date: event_date,
       number: 0
     }
 
@@ -49,14 +51,17 @@ defmodule Stone.Transactions.Ledgers do
   def transfer(
         amount,
         %CheckingAccount{} = checking_account,
-        %CheckingAccount{} = destination_checking_account
+        %CheckingAccount{} = destination_checking_account,
+        opts \\ []
       ) do
+    event_date = Keyword.get(opts, :event_date, DateTime.utc_now())
+
     debit_ledger = %{
       amount: amount,
       description: "Transfered to #{destination_checking_account.number}",
       type: :debit,
       checking_account_id: checking_account.id,
-      event_date: DateTime.utc_now(),
+      event_date: event_date,
       number: 0
     }
 
@@ -65,7 +70,7 @@ defmodule Stone.Transactions.Ledgers do
       description: "Received from #{checking_account.number}",
       type: :credit,
       checking_account_id: destination_checking_account.id,
-      event_date: DateTime.utc_now(),
+      event_date: event_date,
       number: 0
     }
 
@@ -83,15 +88,27 @@ defmodule Stone.Transactions.Ledgers do
   end
 
   @doc """
+  Takes the ledgers balance of the given account number.
+
+  `account_number` The account number to take the ledger balance of
+  `number_of_ledgers` The number of balances to take, 0 for all
+  """
+  def take_ledgers_balance(account_number, number_of_ledgers) do
+    GenServer.call(@name, {:take_ledgers_balance, account_number, number_of_ledgers})
+  end
+
+  @doc """
   Sends a credit operation to add 1_000 funds to the newly created account.
   """
-  def initial_credit(%CheckingAccount{} = checking_account) do
+  def initial_credit(%CheckingAccount{} = checking_account, opts \\ []) do
+    event_date = Keyword.get(opts, :event_date, DateTime.utc_now())
+
     ledger_event = %{
       amount: 100_000,
       description: "Initial Credit For Opening Account :)",
       type: :credit,
       checking_account_id: checking_account.id,
-      event_date: DateTime.utc_now(),
+      event_date: event_date,
       number: 0
     }
 
@@ -185,6 +202,23 @@ defmodule Stone.Transactions.Ledgers do
       {:error, changeset} ->
         {:error, changeset}
     end
+  end
+
+  @impl true
+  def handle_call({:take_ledgers_balance, account_number, number_of_ledgers}, _from, ledgers) do
+    %LedgerState{ledger_balances: ledger_balances} =
+      Map.get(ledgers, account_number, %LedgerState{})
+
+    ledger_balances =
+      case number_of_ledgers do
+        0 ->
+          ledger_balances
+
+        number_of_ledgers ->
+          Enum.take(ledger_balances, number_of_ledgers)
+      end
+
+    reply(ledger_balances, ledgers)
   end
 
   @doc """
