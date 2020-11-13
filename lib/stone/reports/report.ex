@@ -22,9 +22,6 @@ defmodule Stone.Reports.Report do
     ledger_balance_to_report({Date.utc_today(), ledger_balance, []})
   end
 
-  @doc """
-  Transform the given ledger balance into `Stone.Reports.Report` structure
-  """
   def ledger_balance_to_report(
         {%Date{} = date,
          %{

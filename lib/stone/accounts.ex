@@ -58,7 +58,7 @@ defmodule Stone.Accounts do
     |> Repo.insert()
   end
 
-  def create_user_with_checking_account(attrs \\ %{}) do
+  def create_user_with_checking_account(attrs \\ %{}, opts \\ []) do
     Multi.new()
     |> Multi.insert(:user, User.changeset(%User{}, attrs))
     |> Multi.insert(:checking_account, fn %{user: user} ->
@@ -67,7 +67,7 @@ defmodule Stone.Accounts do
     |> Repo.transaction()
     |> case do
       {:ok, %{user: user, checking_account: checking_account}} ->
-        Ledgers.initial_credit(checking_account)
+        Ledgers.initial_credit(checking_account, opts)
 
         user = Repo.preload(user, checking_account: :ledger_events)
 

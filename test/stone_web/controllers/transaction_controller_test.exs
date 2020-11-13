@@ -17,7 +17,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"id" => id, "amount" => amount, "type" => type, "description" => description} =
+      assert %{"id" => _id, "amount" => _amount, "type" => _type, "description" => _description} =
                json_response(conn, 201)
     end
 
@@ -33,7 +33,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"id" => id, "amount" => amount, "type" => type, "description" => description} =
+      assert %{"id" => id, "amount" => _amount, "type" => _type, "description" => _description} =
                json_response(conn, 201)
 
       checking_account = Accounts.get_checking_acount_by_id(checking_account.id)
@@ -52,7 +52,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"id" => id, "amount" => amount, "type" => type, "description" => description} =
+      assert %{"id" => _id, "amount" => amount, "type" => type, "description" => description} =
                json_response(conn, 201)
 
       assert amount == 100
@@ -126,7 +126,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"id" => id, "amount" => amount, "type" => type, "description" => description} =
+      assert %{"id" => _id, "amount" => _amount, "type" => _type, "description" => _description} =
                json_response(conn, 201)
 
       conn =
@@ -167,7 +167,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"id" => id, "amount" => amount, "type" => type, "description" => description} =
+      assert %{"id" => _id, "amount" => amount, "type" => _type, "description" => _description} =
                json_response(conn, 201)
 
       assert amount == 100_000
@@ -193,7 +193,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"id" => id, "amount" => amount, "type" => type, "description" => description} =
+      assert %{"id" => _id, "amount" => amount, "type" => _type, "description" => _description} =
                json_response(conn, 201)
 
       assert amount == 100
@@ -214,7 +214,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"id" => id, "amount" => amount, "type" => type, "description" => description} =
+      assert %{"id" => id, "amount" => _amount, "type" => _type, "description" => _description} =
                json_response(conn, 201)
 
       checking_account = Accounts.get_checking_acount_by_id(checking_account.id)
@@ -235,7 +235,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"id" => id, "amount" => amount, "type" => type, "description" => description} =
+      assert %{"id" => _id, "amount" => _amount, "type" => _type, "description" => _description} =
                json_response(conn, 201)
 
       second_checking_account = Accounts.get_checking_acount_by_id(second_checking_account.id)
@@ -257,7 +257,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"error" => %{"code" => "T0004", "message" => message}} = json_response(conn, 422)
+      assert %{"error" => %{"code" => "T0004", "message" => _message}} = json_response(conn, 422)
     end
 
     test "POST /transfer with negative amount should return an error", %{
@@ -274,7 +274,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"error" => %{"code" => "T0005", "message" => message}} = json_response(conn, 422)
+      assert %{"error" => %{"code" => "T0005", "message" => _message}} = json_response(conn, 422)
     end
 
     test "POST /transfer to same account number returns an error", %{
@@ -291,7 +291,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"error" => %{"code" => "T0006", "message" => message}} = json_response(conn, 422)
+      assert %{"error" => %{"code" => "T0006", "message" => _message}} = json_response(conn, 422)
     end
 
     test "POST /transfer with invalid non integer amount returns an error", %{
@@ -308,7 +308,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"error" => %{"code" => "T0002", "message" => message}} = json_response(conn, 422)
+      assert %{"error" => %{"code" => "T0002", "message" => _message}} = json_response(conn, 422)
     end
 
     test "POST /transfer should not lead to negative balance on source account", %{
@@ -325,7 +325,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"error" => %{"code" => "T0003", "message" => message}} = json_response(conn, 422)
+      assert %{"error" => %{"code" => "T0003", "message" => _message}} = json_response(conn, 422)
     end
 
     test "POST /transfer should allow to transfer all funds", %{
@@ -342,7 +342,7 @@ defmodule StoneWeb.TransactionControllerTest do
           transaction_id: transaction_id
         )
 
-      assert %{"id" => id, "amount" => amount, "type" => type, "description" => description} =
+      assert %{"id" => _id, "amount" => _amount, "type" => _type, "description" => _description} =
                json_response(conn, 201)
 
       checking_account = Accounts.get_checking_acount_by_id(checking_account.id)

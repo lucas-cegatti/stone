@@ -14,7 +14,7 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %LedgerEvent{} = ledger_event} =
+      assert {:ok, %LedgerEvent{} = _ledger_event} =
                Transactions.withdrawal(1000, checking_account, transaction_id)
     end
 
@@ -23,7 +23,7 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %LedgerEvent{} = ledger_event} =
+      assert {:ok, %LedgerEvent{} = _ledger_event} =
                Transactions.withdrawal(1000, checking_account, transaction_id)
 
       checking_account = Accounts.get_checking_acount_by_id(checking_account.id)
@@ -37,7 +37,7 @@ defmodule Stone.TransactionsTest do
          } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %LedgerEvent{} = ledger_event} =
+      assert {:ok, %LedgerEvent{} = _ledger_event} =
                Transactions.withdrawal(1000, checking_account, transaction_id)
 
       checking_account = Accounts.get_checking_acount_by_id(checking_account.id)
@@ -80,13 +80,13 @@ defmodule Stone.TransactionsTest do
          } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert %TransactionError{code: "T0002", message: message} =
+      assert %TransactionError{code: "T0002", message: _message} =
                Transactions.withdrawal("a", checking_account, transaction_id)
 
-      assert %TransactionError{code: "T0002", message: message} =
+      assert %TransactionError{code: "T0002", message: _message} =
                Transactions.withdrawal("-1000", checking_account, transaction_id)
 
-      assert %TransactionError{code: "T0002", message: message} =
+      assert %TransactionError{code: "T0002", message: _message} =
                Transactions.withdrawal(1.85, checking_account, transaction_id)
     end
 
@@ -95,14 +95,14 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert %TransactionError{code: "T0003", message: message} =
+      assert %TransactionError{code: "T0003", message: _message} =
                Transactions.withdrawal(101_000, checking_account, transaction_id)
     end
 
     test "withdrawal/2 should not accept invalid checking account" do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert %TransactionError{code: "T0004", message: message} =
+      assert %TransactionError{code: "T0004", message: _message} =
                Transactions.withdrawal(1000, nil, transaction_id)
     end
 
@@ -115,7 +115,7 @@ defmodule Stone.TransactionsTest do
                 StreamData.constant(Transactions.get_transaction_id_for_checking_account()),
               max_runs: 30
             ) do
-        assert {:ok, %LedgerEvent{} = ledger_event} =
+        assert {:ok, %LedgerEvent{} = _ledger_event} =
                  Transactions.withdrawal(amount, checking_account, transaction_id)
       end
 
@@ -146,7 +146,7 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %LedgerEvent{} = ledger_event} =
+      assert {:ok, %LedgerEvent{} = _ledger_event} =
                Transactions.transfer(
                  100,
                  checking_account,
@@ -180,7 +180,7 @@ defmodule Stone.TransactionsTest do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
       old_balance = checking_account.balance
 
-      assert {:ok, %LedgerEvent{} = ledger_event} =
+      assert {:ok, %LedgerEvent{} = _ledger_event} =
                Transactions.transfer(
                  100,
                  checking_account,
@@ -199,7 +199,7 @@ defmodule Stone.TransactionsTest do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
       old_balance = second_checking_account.balance
 
-      assert {:ok, %LedgerEvent{} = ledger_event} =
+      assert {:ok, %LedgerEvent{} = _ledger_event} =
                Transactions.transfer(
                  100,
                  checking_account,
@@ -238,7 +238,7 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert {:ok, %LedgerEvent{} = ledger_event} =
+      assert {:ok, %LedgerEvent{} = _ledger_event} =
                Transactions.transfer(
                  100,
                  checking_account,
@@ -276,7 +276,7 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert %TransactionError{code: "T0005", message: message} =
+      assert %TransactionError{code: "T0005", message: _message} =
                Transactions.transfer(
                  -100,
                  checking_account,
@@ -291,7 +291,7 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert %TransactionError{code: "T0002", message: message} =
+      assert %TransactionError{code: "T0002", message: _message} =
                Transactions.transfer(
                  "a",
                  checking_account,
@@ -299,7 +299,7 @@ defmodule Stone.TransactionsTest do
                  transaction_id
                )
 
-      assert %TransactionError{code: "T0002", message: message} =
+      assert %TransactionError{code: "T0002", message: _message} =
                Transactions.transfer(
                  1.5,
                  checking_account,
@@ -307,7 +307,7 @@ defmodule Stone.TransactionsTest do
                  transaction_id
                )
 
-      assert %TransactionError{code: "T0002", message: message} =
+      assert %TransactionError{code: "T0002", message: _message} =
                Transactions.transfer(
                  "100",
                  checking_account,
@@ -322,7 +322,7 @@ defmodule Stone.TransactionsTest do
     } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert %TransactionError{code: "T0004", message: message} =
+      assert %TransactionError{code: "T0004", message: _message} =
                Transactions.transfer(
                  100,
                  nil,
@@ -338,7 +338,7 @@ defmodule Stone.TransactionsTest do
          } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert %TransactionError{code: "T0004", message: message} =
+      assert %TransactionError{code: "T0004", message: _message} =
                Transactions.transfer(
                  100,
                  checking_account,
@@ -354,7 +354,7 @@ defmodule Stone.TransactionsTest do
          } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert %TransactionError{code: "T0003", message: message} =
+      assert %TransactionError{code: "T0003", message: _message} =
                Transactions.transfer(
                  100_001,
                  checking_account,
@@ -370,7 +370,7 @@ defmodule Stone.TransactionsTest do
          } do
       transaction_id = Transactions.get_transaction_id_for_checking_account()
 
-      assert %TransactionError{code: "T0003", message: message} =
+      assert %TransactionError{code: "T0003", message: _message} =
                Transactions.transfer(
                  100_001,
                  checking_account,
@@ -395,7 +395,7 @@ defmodule Stone.TransactionsTest do
                 StreamData.constant(Transactions.get_transaction_id_for_checking_account()),
               max_runs: 30
             ) do
-        assert {:ok, %LedgerEvent{} = ledger_event} =
+        assert {:ok, %LedgerEvent{} = _ledger_event} =
                  Transactions.transfer(
                    amount,
                    checking_account,

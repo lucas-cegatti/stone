@@ -19,10 +19,18 @@ defmodule Stone.Transactions.TransactionIdTest do
       assert {:ok, []} = TransactionId.take(transaction_id)
 
       assert {:error, :not_found, transaction_id} = TransactionId.take(transaction_id)
+
+      assert String.match?(
+               transaction_id,
+               ~r/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
+             )
     end
 
     test "taks/1 with a random uuid should return error not found" do
-      assert {:error, :not_found, transaction_id} = TransactionId.take(Ecto.UUID.generate())
+      transaction_id = Ecto.UUID.generate()
+      assert {:error, :not_found, response_transaction_id} = TransactionId.take(transaction_id)
+
+      assert transaction_id == response_transaction_id
     end
   end
 end

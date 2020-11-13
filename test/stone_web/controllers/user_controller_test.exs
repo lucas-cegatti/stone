@@ -38,10 +38,10 @@ defmodule StoneWeb.UserControllerTest do
   describe "create user" do
     test "renders user when data is valid", %{conn: conn} do
       conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs)
-      assert %{"id" => id, "name" => name, "email" => email} = json_response(conn, 201)["data"]
+      assert %{"id" => _id, "name" => name, "email" => email} = json_response(conn, 201)["data"]
 
-      assert name = @create_attrs.name
-      assert email = @create_attrs.email
+      assert name == @create_attrs.name
+      assert email == @create_attrs.email
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -61,7 +61,7 @@ defmodule StoneWeb.UserControllerTest do
       conn = get(conn, Routes.user_path(conn, :show, id))
 
       assert %{
-               "id" => id,
+               "id" => _id,
                "email" => "foo1@bar.com",
                "name" => "Foo Bar 1"
              } = json_response(conn, 200)["data"]

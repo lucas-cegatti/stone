@@ -123,6 +123,10 @@ defmodule Stone.Transactions.Ledgers do
     end
   end
 
+  def get_status() do
+    :sys.get_status(@name)
+  end
+
   @impl true
   def init(ledgers) do
     {:ok, ledgers}
