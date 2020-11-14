@@ -7,7 +7,7 @@ services:
       args:
         - ENV=prod
       cache_from:
-        - elixir:1.10.3-alpine
+        - elixir:1.11.2-alpine
         - stone
     depends_on:
       - db
@@ -18,6 +18,7 @@ services:
       DB_HOST: db
       DB_USER: postgres
       DB_PASS: postgres
+      DATABASE_URL: ecto://postgres:postgres@db/stone_dev
       SECRET_KEY_BASE: MBBhVeA0yci+a94dbzKqgog3yjNKVHe63FFPEHmsELr6idwPivSxRNSUIs09B13w
   db:
     image: postgres:11.5-alpine
