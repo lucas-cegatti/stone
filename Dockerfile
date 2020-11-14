@@ -1,9 +1,9 @@
 # ---- Build Stage ----
-FROM elixir:1.10.3-alpine AS app_builder
+FROM elixir:1.11.2-alpine AS app_builder
 
 # Install build dependencies
 # hadolint ignore=DL3018
-RUN apk add --no-cache git build-base nodejs npm python
+RUN apk add --no-cache git build-base
 
 # Prepare build dir
 RUN mkdir /app
@@ -14,7 +14,7 @@ RUN mix local.hex --force && \
     mix local.rebar --force
 
 # Set build ENV
-ARG ENV=dev
+ARG ENV=prod
 ARG VERSION=docker_default
 ENV MIX_ENV=${ENV} TERM=xterm LANG=C.UTF-8 \
     # Disable Elixir code reload
@@ -26,18 +26,7 @@ COPY config config
 RUN mix deps.get
 RUN mix deps.compile
 
-# Build assets
-COPY assets/css assets/css
-COPY assets/js assets/js
-COPY assets/scss assets/scss
-COPY assets/static assets/static
-COPY assets/.babelrc assets/.babelrc
-COPY assets/package-lock.json assets/package-lock.json
-COPY assets/package.json assets/package.json
-COPY assets/webpack.config.js assets/webpack.config.js
-
 # hadolint ignore=DL3003
-RUN cd assets && npm install && npm run deploy
 RUN mix phx.digest
 
 # Build project
@@ -54,7 +43,7 @@ RUN mix release
 FROM alpine:3.9.4 AS app
 
 # Set environment variables
-ARG ENV=dev
+ARG ENV=prod
 ENV MIX_ENV=${ENV} TERM=xterm LANG=C.UTF-8
 
 # Install app dependencies
@@ -67,9 +56,6 @@ WORKDIR /usr/src/app
 
 # Copy bin files
 COPY bin ./bin
-
-# Copy RSA KEYS
-COPY rsa_keys ./rsa_keys
 
 # Copy over the build artifact from the previous step
 COPY --from=app_builder /app/_build .

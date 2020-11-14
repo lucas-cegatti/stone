@@ -11,7 +11,12 @@ defmodule Stone.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      test_coverage: [tool: ExCoveralls]
+      test_coverage: [tool: ExCoveralls],
+      releases: [
+        stone: [
+          include_executables_for: [:unix]
+        ]
+      ]
     ]
   end
 
