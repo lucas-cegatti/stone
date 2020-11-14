@@ -170,4 +170,8 @@ defmodule Stone.Accounts do
         checking_account |> Repo.preload(:ledger_events)
     end
   end
+
+  def list_checking_accounts() do
+    Repo.all(CheckingAccount) |> Repo.preload([:user, :ledger_events])
+  end
 end

@@ -6,9 +6,12 @@ defmodule Stone.Transactions.Ledgers do
   """
   use GenServer
 
+  require Logger
+
   @name CheckingAccountLedgers
 
   alias Stone.Repo
+  alias Stone.Accounts
   alias Stone.Accounts.CheckingAccount
   alias Stone.Transactions.{LedgerEvent, TransactionError, LedgerState}
 
@@ -128,7 +131,23 @@ defmodule Stone.Transactions.Ledgers do
   end
 
   @impl true
-  def init(ledgers) do
+  def init(_ledgers) do
+    Logger.warn("=== Starting Ledger State Cache ===")
+
+    ledgers =
+      Accounts.list_checking_accounts()
+      |> Enum.reduce(%{}, fn checking_account, ledgers ->
+        ledger_state =
+          checking_account.ledger_events
+          |> group_ledger_events_by_day()
+          |> reduce_and_calculate_total_by_day()
+          |> update_current_state(%LedgerState{})
+
+        Map.put(ledgers, checking_account.number, ledger_state)
+      end)
+
+    Logger.warn("=== Finished Ledger State Cache ===")
+
     {:ok, ledgers}
   end
 
