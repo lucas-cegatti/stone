@@ -1,7 +1,6 @@
 defmodule Stone.ReportsTest do
   use Stone.DataCase
 
-  alias Stone.Transactions.Ledgers
   alias Stone.Accounts.CheckingAccount
   alias Stone.Reports.{Report, ReportError}
   alias Stone.{Reports, Accounts, Transactions}
@@ -27,7 +26,7 @@ defmodule Stone.ReportsTest do
     } do
       checking_account = %CheckingAccount{checking_account | number: "invalid"}
 
-      assert %ReportError{code: "R0001", message: message} =
+      assert %ReportError{code: "R0001", message: _message} =
                Reports.report_by_day(checking_account)
     end
   end
@@ -38,17 +37,60 @@ defmodule Stone.ReportsTest do
     test "total_report_by_month/1 with initial account and transactions should return report data",
          %{
            checking_account: checking_account,
-           totals: totals
+           totals: _totals
          } do
-      total = Money.new(totals.total) |> Money.to_string()
-      total_debits = Money.new(totals.total_debits) |> Money.to_string()
-      total_credits = Money.new(totals.total_credits) |> Money.to_string()
+      assert %Report{} = Reports.total_report_by_month(checking_account)
+    end
 
-      assert %Report{} = report = Reports.total_report_by_month(checking_account)
+    test "total_report_by_month/1 with invalid account number return report error R0001", %{
+      checking_account: checking_account
+    } do
+      checking_account = %CheckingAccount{checking_account | number: "invalid"}
 
-      # assert report.total_credits == total_credits
-      # assert report.total_debits == total_debits
-      # assert report.total == total
+      assert %ReportError{code: "R0001", message: _message} =
+               Reports.total_report_by_month(checking_account)
+    end
+  end
+
+  describe "year reports" do
+    setup [:setup_checking_account, :setup_month_transactions]
+
+    test "total_report_by_year/1 with initial account and transactions should return report data",
+         %{
+           checking_account: checking_account,
+           totals: _totals
+         } do
+      assert %Report{} = Reports.total_report_by_year(checking_account)
+    end
+
+    test "total_report_by_year/1 with invalid account number return report error R0001", %{
+      checking_account: checking_account
+    } do
+      checking_account = %CheckingAccount{checking_account | number: "invalid"}
+
+      assert %ReportError{code: "R0001", message: _message} =
+               Reports.total_report_by_year(checking_account)
+    end
+  end
+
+  describe "total reports" do
+    setup [:setup_checking_account, :setup_month_transactions]
+
+    test "total_report/1 with initial account and transactions should return report data",
+         %{
+           checking_account: checking_account,
+           totals: _totals
+         } do
+      assert %Report{} = Reports.total_report(checking_account)
+    end
+
+    test "total_report/1 with invalid account number return report error R0001", %{
+      checking_account: checking_account
+    } do
+      checking_account = %CheckingAccount{checking_account | number: "invalid"}
+
+      assert %ReportError{code: "R0001", message: _message} =
+               Reports.total_report(checking_account)
     end
   end
 

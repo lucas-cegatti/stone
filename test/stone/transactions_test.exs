@@ -135,6 +135,17 @@ defmodule Stone.TransactionsTest do
 
       assert String.contains?(message, transaction_id)
     end
+
+    test "withdrawal/2 with invalid data for database returns {:error, changeset}", %{
+      checking_account: checking_account
+    } do
+      transaction_id = Transactions.get_transaction_id_for_checking_account()
+
+      assert {:error, %Ecto.Changeset{}} =
+               Transactions.withdrawal(1000, checking_account, transaction_id,
+                 event_date: {:ok, DateTime.utc_now()}
+               )
+    end
   end
 
   describe "transactions transfer" do
@@ -225,7 +236,9 @@ defmodule Stone.TransactionsTest do
                  transaction_id
                )
 
-      response_checking_account = Accounts.get_checking_acount_by_id(ledger_event.checking_account_id)
+      response_checking_account =
+        Accounts.get_checking_acount_by_id(ledger_event.checking_account_id)
+
       debit_ledger = List.first(response_checking_account.ledger_events)
 
       assert debit_ledger.type == :debit
@@ -413,6 +426,23 @@ defmodule Stone.TransactionsTest do
       transfered = second_checking_account.balance - 100_000
 
       assert 100_000 == transfered + checking_account.balance
+    end
+
+    test "transfer/4 with invalid database data should return {:error, changeset}",
+         %{
+           checking_account: checking_account,
+           second_checking_account: second_checking_account
+         } do
+      transaction_id = Transactions.get_transaction_id_for_checking_account()
+
+      assert {:error, %Ecto.Changeset{}} =
+               Transactions.transfer(
+                 100_000,
+                 checking_account,
+                 second_checking_account,
+                 transaction_id,
+                 event_date: {:ok, DateTime.utc_now()}
+               )
     end
   end
 

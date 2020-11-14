@@ -23,10 +23,20 @@ defmodule StoneWeb.Router do
   scope "/api/v1", StoneWeb do
     pipe_through [:api, :authenticated]
 
+    # user
     get "/self", UserController, :show
 
+    # transactions
     post "/withdrawal", TransactionController, :withdrawal
     post "/transfer", TransactionController, :transfer
+
+    # reports
+    scope "/reports" do
+      get "/day", ReportController, :day
+      get "/month", ReportController, :month
+      get "/year", ReportController, :year
+      get "/total", ReportController, :total
+    end
   end
 
   # Enables LiveDashboard only for development

@@ -204,7 +204,7 @@ defmodule Stone.Transactions.Ledgers do
         )
 
       {:error, changeset} ->
-        {:error, changeset}
+        reply({:error, changeset}, ledgers)
     end
   end
 

@@ -1,6 +1,8 @@
 defmodule StoneWeb.UserControllerTest do
   use StoneWeb.ConnCase
 
+  import Stone.Guardian
+
   alias Stone.Accounts
   alias Stone.Accounts.User
 
@@ -10,16 +12,11 @@ defmodule StoneWeb.UserControllerTest do
     password: "passwordHash",
     password_confirmation: "passwordHash"
   }
-  @update_attrs %{
-    email: "foo1@bar.com",
-    name: "Foo Bar 1",
-    password: "passwordHash1",
-    password_confirmation: "passwordHash1"
-  }
+
   @invalid_attrs %{email: nil, name: nil, password: nil}
 
   def fixture(:user) do
-    {:ok, user} = Accounts.create_user(@create_attrs)
+    {:ok, user} = Accounts.create_user_with_checking_account(@create_attrs)
     user
   end
 
@@ -27,18 +24,12 @@ defmodule StoneWeb.UserControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  describe "index" do
-    @tag :skip
-    test "lists all users", %{conn: conn} do
-      conn = get(conn, Routes.user_path(conn, :index))
-      assert json_response(conn, 200)["data"] == []
-    end
-  end
-
   describe "create user" do
     test "renders user when data is valid", %{conn: conn} do
       conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs)
-      assert %{"id" => _id, "name" => name, "email" => email} = json_response(conn, 201)["data"]
+
+      assert %{"user" => %{"id" => _id, "name" => name, "email" => email}} =
+               json_response(conn, 201)["data"]
 
       assert name == @create_attrs.name
       assert email == @create_attrs.email
@@ -47,44 +38,6 @@ defmodule StoneWeb.UserControllerTest do
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.user_path(conn, :create), user: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "update user" do
-    setup [:create_user]
-
-    @tag :skip
-    test "renders user when data is valid", %{conn: conn, user: %User{id: id} = user} do
-      conn = put(conn, Routes.user_path(conn, :update, user), user: @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
-
-      conn = get(conn, Routes.user_path(conn, :show, id))
-
-      assert %{
-               "id" => _id,
-               "email" => "foo1@bar.com",
-               "name" => "Foo Bar 1"
-             } = json_response(conn, 200)["data"]
-    end
-
-    @tag :skip
-    test "renders errors when data is invalid", %{conn: conn, user: user} do
-      conn = put(conn, Routes.user_path(conn, :update, user), user: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "delete user" do
-    setup [:create_user]
-
-    @tag :skip
-    test "deletes chosen user", %{conn: conn, user: user} do
-      conn = delete(conn, Routes.user_path(conn, :delete, user))
-      assert response(conn, 204)
-
-      assert_error_sent 404, fn ->
-        get(conn, Routes.user_path(conn, :show, user))
-      end
     end
   end
 
@@ -107,7 +60,7 @@ defmodule StoneWeb.UserControllerTest do
     } do
       conn = post(conn, Routes.user_path(conn, :sign_in), email: email, password: "invalid_pass")
 
-      assert %{"error" => "Falha de Autenticação"} = json_response(conn, 401)
+      assert %{"error" => "Authentication Failed"} = json_response(conn, 401)
     end
 
     test "signing in user with invalid email returns 401 unauthorized", %{
@@ -117,7 +70,58 @@ defmodule StoneWeb.UserControllerTest do
       conn =
         post(conn, Routes.user_path(conn, :sign_in), email: "bar@foo.com", password: password)
 
-      assert %{"error" => "Falha de Autenticação"} = json_response(conn, 401)
+      assert %{"error" => "Authentication Failed"} = json_response(conn, 401)
+    end
+  end
+
+  describe "self" do
+    setup [:create_user]
+
+    test "GET /self with valid token returns user and checking account data", %{
+      conn: conn,
+      user: user
+    } do
+      {:ok, token, _} = encode_and_sign(user, %{}, token_type: :access)
+
+      conn =
+        conn
+        |> put_req_header("accept", "application/json")
+        |> put_req_header("authorization", "Bearer " <> token)
+        |> get(Routes.user_path(conn, :show))
+
+      assert %{"user" => _user, "checking_account" => _checking_account} =
+               json_response(conn, 200)["data"]
+    end
+
+    test "GET /self with valid token returns user and checking account valid data", %{
+      conn: conn,
+      user: user
+    } do
+      {:ok, token, _} = encode_and_sign(user, %{}, token_type: :access)
+
+      conn =
+        conn
+        |> put_req_header("accept", "application/json")
+        |> put_req_header("authorization", "Bearer " <> token)
+        |> get(Routes.user_path(conn, :show))
+
+      assert %{"user" => r_user, "checking_account" => r_checking_account} =
+               json_response(conn, 200)["data"]
+
+      assert user.id == r_user["id"]
+      assert user.checking_account.number == r_checking_account["number"]
+    end
+
+    test "GET /self with invalid token returns 401 unauthorized", %{
+      conn: conn
+    } do
+      conn =
+        conn
+        |> put_req_header("accept", "application/json")
+        |> put_req_header("authorization", "Bearer " <> "invalid")
+        |> get(Routes.user_path(conn, :show))
+
+      assert %{"error" => "invalid_token"} = json_response(conn, 401)
     end
   end
 

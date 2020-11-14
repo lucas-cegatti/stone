@@ -352,6 +352,45 @@ defmodule StoneWeb.TransactionControllerTest do
     end
   end
 
+  describe "unauthorized" do
+    setup [:setup_checking_account, :setup_second_checking_account]
+
+    test "POST /withdrawal with invalid token returns error unauthorized", %{conn: conn} do
+      transaction_id = Transactions.get_transaction_id_for_checking_account()
+
+      conn =
+        conn
+        |> put_req_header("accept", "application/json")
+        |> put_req_header("authorization", "Bearer " <> "invalid")
+        |> post(Routes.transaction_path(conn, :withdrawal),
+          amount: 100,
+          transaction_id: transaction_id
+        )
+
+      assert %{"error" => "invalid_token"} = json_response(conn, 401)
+    end
+
+    test "POST /transfer with invalid token returns error unauthorized", %{
+      conn: conn,
+      checking_account: _checking_account,
+      second_checking_account: second_checking_account
+    } do
+      transaction_id = Transactions.get_transaction_id_for_checking_account()
+
+      conn =
+        conn
+        |> put_req_header("accept", "application/json")
+        |> put_req_header("authorization", "Bearer " <> "invalid")
+        |> post(Routes.transaction_path(conn, :transfer),
+          amount: 100_000,
+          destination_account_number: second_checking_account.number,
+          transaction_id: transaction_id
+        )
+
+      assert %{"error" => "invalid_token"} = json_response(conn, 401)
+    end
+  end
+
   defp setup_checking_account(_context) do
     valid_user_attrs = %{
       email: "foo@bar.com",
