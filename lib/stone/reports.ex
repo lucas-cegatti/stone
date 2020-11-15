@@ -49,7 +49,7 @@ defmodule Stone.Reports do
 
   defp reduce_ledger_balances_to_total(ledger_balances) do
     ledger_balances
-    |> Enum.reduce(%{}, fn {_date, ledger_balance, _ledger_events}, acc ->
+    |> Enum.reduce(%{}, fn {_date, ledger_balance, ledger_events}, acc ->
       total_credits = ledger_balance.total_credits
       total_debits = ledger_balance.total_debits
       total = ledger_balance.total
@@ -58,6 +58,7 @@ defmodule Stone.Reports do
       |> Map.update(:total_credits, total_credits, &(&1 + total_credits))
       |> Map.update(:total_debits, total_debits, &(&1 + total_debits))
       |> Map.update(:total, total, &(&1 + total))
+      |> Map.update(:ledger_events, ledger_events, &(&1 ++ ledger_events))
     end)
   end
 

@@ -228,17 +228,22 @@ defmodule Stone.Transactions.Ledgers do
   end
 
   @impl true
-  def handle_call({:take_ledgers_balance, account_number, number_of_ledgers}, _from, ledgers) do
+  def handle_call({:take_ledgers_balance, account_number, number_of_days}, _from, ledgers) do
     %LedgerState{ledger_balances: ledger_balances} =
       Map.get(ledgers, account_number, %LedgerState{})
 
     ledger_balances =
-      case number_of_ledgers do
+      case number_of_days do
         0 ->
           ledger_balances
 
-        number_of_ledgers ->
-          Enum.take(ledger_balances, number_of_ledgers)
+        number_of_days ->
+          date_range =
+            Date.range(Date.utc_today(), Date.add(Date.utc_today(), number_of_days * -1))
+
+          Enum.filter(ledger_balances, fn {date, _ledger_balance, _ledger_event} ->
+            Enum.member?(date_range, date)
+          end)
       end
 
     reply(ledger_balances, ledgers)
