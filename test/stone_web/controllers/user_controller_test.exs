@@ -24,7 +24,7 @@ defmodule StoneWeb.UserControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  describe "create user" do
+  describe "sign up" do
     test "renders user when data is valid", %{conn: conn} do
       conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs)
 
@@ -37,6 +37,16 @@ defmodule StoneWeb.UserControllerTest do
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.user_path(conn, :create), user: @invalid_attrs)
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "renders errors when repeated email is given", %{conn: conn} do
+      conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs)
+
+      assert %{"user" => %{"id" => _id, "name" => _name, "email" => _email}} =
+        json_response(conn, 201)["data"]
+
+      conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end

@@ -352,6 +352,21 @@ defmodule StoneWeb.TransactionControllerTest do
     end
   end
 
+  describe "/transactions_id" do
+    setup [:setup_checking_account, :setup_conn_headers]
+
+    test "GET /transaction returns a valid transaction id", %{conn: conn} do
+      conn = get(conn, Routes.transaction_path(conn, :transaction_id))
+
+      assert %{"transaction_id" => transaction_id} = json_response(conn, 200)
+
+      assert String.match?(
+               transaction_id,
+               ~r/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
+             )
+    end
+  end
+
   describe "unauthorized" do
     setup [:setup_checking_account, :setup_second_checking_account]
 

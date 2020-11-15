@@ -25,4 +25,10 @@ defmodule StoneWeb.TransactionView do
       description: ledger_event.description
     }
   end
+
+  def render("transaction_id.json", %{transaction_id: transaction_id}) do
+    %{
+      transaction_id: transaction_id
+    }
+  end
 end

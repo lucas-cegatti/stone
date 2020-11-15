@@ -38,7 +38,7 @@ defmodule Stone.Reports.Report do
     total = Money.new(total)
 
     %__MODULE__{
-      date: :io_lib.format("~2..0B/~2..0B/~4..0B", [date.day, date.month, date.year]),
+      date: :io_lib.format("~2..0B/~2..0B/~4..0B", [date.day, date.month, date.year]) |> to_string(),
       total_credits: Money.to_string(total_credits),
       total_debits: Money.to_string(total_debits),
       total: Money.to_string(total),
@@ -66,7 +66,7 @@ defmodule Stone.Reports.Report do
           ledger_event.event_date.hour,
           ledger_event.event_date.minute,
           ledger_event.event_date.second
-        ])
+        ]) |> to_string()
 
       %{
         id: ledger_event.id,

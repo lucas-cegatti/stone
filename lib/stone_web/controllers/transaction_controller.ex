@@ -46,4 +46,12 @@ defmodule StoneWeb.TransactionController do
         error
     end
   end
+
+  def transaction_id(conn, _params) do
+    transaction_id = Transactions.get_transaction_id_for_checking_account()
+
+    conn
+    |> put_status(:ok)
+    |> render("transaction_id.json", transaction_id: transaction_id)
+  end
 end

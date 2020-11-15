@@ -120,5 +120,12 @@ defmodule Stone.AccountsTest do
       assert ledger_event.amount == 100_000
       # assert ledger_event.number == 1
     end
+
+    test "create_user with existing email returns an error" do
+      assert {:ok, %User{}} = Accounts.create_user_with_checking_account(@valid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Accounts.create_user_with_checking_account(@valid_attrs)
+    end
   end
 end

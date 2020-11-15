@@ -29,6 +29,7 @@ defmodule StoneWeb.Router do
     # transactions
     post "/withdrawal", TransactionController, :withdrawal
     post "/transfer", TransactionController, :transfer
+    get "/transaction_id", TransactionController, :transaction_id
 
     # reports
     scope "/reports" do

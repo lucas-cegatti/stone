@@ -141,7 +141,7 @@ defmodule Stone.Transactions.Ledgers do
           checking_account.ledger_events
           |> group_ledger_events_by_day()
           |> reduce_and_calculate_total_by_day()
-          |> update_current_state(%LedgerState{})
+          |> update_current_state(%LedgerState{balance: checking_account.balance})
 
         Map.put(ledgers, checking_account.number, ledger_state)
       end)
