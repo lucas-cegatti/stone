@@ -1,24 +1,41 @@
 # Stone
 Código com a solução para o desafio [API de Banking da Stone](https://gist.github.com/Isabelarrodrigues/15e62f07eebf4e076b93897a64d9c674).
+
+A versão online está disponível neste link [https://stone.gigalixirapp.com/](https://stone.gigalixirapp.com/)
 ## Versions
 - Elixir 1.11.2
 - OTP 22
 
+## Docker
+O build da imagem docker é feito utilizando o `mix release`, migrations e seeds são rodados automaticamente, há também um arquivo docker-compose que o banco e o app.
+
+- Iniciar via docker-compose: `docker-compose up`
+- Iniciar via docker: 
+```
+docker run -e DB_NAME=stone_dev \
+-e DB_HOST=db \
+-e DB_USER=postgres \
+-e DB_PASS=postgres \
+-e DATABASE_URL=ecto://postgres:postgres@db/stone_dev \
+-e SECRET_KEY_BASE=MBBhVeA0yci+a94dbzKqgog3yjNKVHe63FFPEHmsELr6idwPivSxRNSUIs09B13w \
+stone
+```
+
 ## API
-A API utiliza autenticação via JWT token onde deve-se ser enviado o `Authorization` header na apis que requerem autenticação.
+A API utiliza autenticação via JWT token onde deve-se ser enviado o `Authorization` header nas apis que requerem autenticação.
 ### Sign in & Sign UP
-São os únicos endereços que possuem rotas públicas `sign_in` e `sign_up`.
+São os únicos endereços que possuem rotas públicas.
 
 *POST* `/sign_up` - Responsável pelo cadastro de um novo usuário e também pela criação da conta com o crédito de R$ 1.000,00:
 #### Example
 Request
-```
+```json
 {
 	"user": {
     "name": "Bar",
-		"email": "bar@foo.com",
-		"password": "somePassword",
-		"password_confirmation": "somePassword"
+	  "email": "bar@foo.com",
+	  "password": "somePassword",
+	  "password_confirmation": "somePassword"
 	}
 }
 ```
@@ -104,11 +121,9 @@ Realiza uma operação de transferência na conta do usuário logado para uma co
 Request
 ```
 {
-    {
     "transaction_id": "b94fefca-3e3f-4479-a47e-6f37f056abde",
     "amount": 10000,
     "destination_account_number": "73960914"
-}
 }
 ```
 Response
@@ -118,5 +133,30 @@ Response
     "description": "Withdrawal from checking account",
     "id": "7a1859d4-9461-4f85-9b5d-9fed5b85b02e",
     "type": "debit"
+}
+```
+### Reports
+Foram criadas 4 rotas para os relatórios:
+- `/day` - Retorna o total agregado + as transações de 1 dia
+- `/month` - Retorna o total agregado + as transações dos últimos 30 dias
+- `/year` - Retorna o total agregado + as transações dos últimos 365 dias
+- `/total` - Retorna o total agregado + todas as transações
+Nenhuma das rotas necessita de parâmetros, apenas o Authorization header é necessário.
+#### Example
+Response
+```
+{
+    "total": "R$1.000,00",
+    "total_credits": "R$1.000,00",
+    "total_debits": "R$0,00",
+    "transactions": [
+        {
+            "amount": "R$1.000,00",
+            "description": "Initial Credit For Opening Account :)",
+            "event_date": "14/11/2020 10:36:19",
+            "id": "ebfe45b1-150b-47f0-806a-8dc397579d7e",
+            "type": "credit"
+        }
+    ]
 }
 ```
