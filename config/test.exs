@@ -19,7 +19,7 @@ config :stone, StoneWeb.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger, level: :error
 
 config :bcrypt_elixir, :log_rounds, 4
 

@@ -33,7 +33,9 @@ config :stone, Stone.Guardian,
   secret_key: "Wqw/rT0faU2jrib9S1y/GiXy3iBSTmZHwIkJR7sR3YsWGt3BwfR6UOfbI9Ollrq8"
 
 config :money,
-  default_currency: :BRL
+  default_currency: :BRL,
+  separator: ".",
+  delimiter: ","
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

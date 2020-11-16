@@ -268,6 +268,14 @@ defmodule Stone.Transactions.Ledgers do
 
   defp group_ledger_events_by_day(ledger_events) do
     Enum.group_by(ledger_events, &DateTime.to_date(&1.event_date))
+    |> Enum.into([])
+    |> Enum.sort(fn {d1, _}, {d2, _} ->
+      case Date.compare(d1, d2) do
+        :gt -> true
+        :eq -> true
+        :lt -> false
+      end
+    end)
   end
 
   _doc = """

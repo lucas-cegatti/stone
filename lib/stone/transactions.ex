@@ -5,8 +5,8 @@ defmodule Stone.Transactions do
 
   import Ecto.Query, warn: false
 
-  alias Stone.Transactions.{TransactionId, TransactionError, Ledgers}
   alias Stone.Accounts.CheckingAccount
+  alias Stone.Transactions.{TransactionId, TransactionError, Ledgers}
 
   @doc """
   Returns a UUID stored at the gen server to be used for a user transaction.
@@ -59,7 +59,13 @@ defmodule Stone.Transactions do
   `checking_account` Stone.Accounts.CheckingAccount
   `destination_checking_account` Stone.Accounts.CheckingAccount
   """
-  def transfer(amount, checking_account, destination_checking_account, _transaction_id, opts \\ [])
+  def transfer(
+        amount,
+        checking_account,
+        destination_checking_account,
+        _transaction_id,
+        opts \\ []
+      )
 
   def transfer(amount, _checking_account, _destination_checking_account, _transaction_id, _opts)
       when not is_integer(amount),
@@ -102,8 +108,11 @@ defmodule Stone.Transactions do
         opts
       ) do
     case TransactionId.take(transaction_id) do
-      {:ok, _opts} -> Ledgers.transfer(amount, checking_account, destination_checking_account, opts)
-      _ -> TransactionError.invalid_transaction_id_error(transaction_id)
+      {:ok, _opts} ->
+        Ledgers.transfer(amount, checking_account, destination_checking_account, opts)
+
+      _ ->
+        TransactionError.invalid_transaction_id_error(transaction_id)
     end
   end
 end

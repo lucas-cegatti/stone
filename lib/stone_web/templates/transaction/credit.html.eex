@@ -1,0 +1,12 @@
+<h1>Stone - New Transaction</h1>
+
+<h2>Credit</h2>
+
+<h3><%= @user.name %> - <%= @user.checking_account.number %></h3>
+
+<h4>
+Date: <%= @ledger_event.date %>
+Amount: <%= @ledger_event.amount %>
+Description: <%= @ledger_event.description %>
+ID: <%= @ledger_event.id %>
+</h4>

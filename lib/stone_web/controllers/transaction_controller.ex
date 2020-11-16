@@ -1,6 +1,7 @@
 defmodule StoneWeb.TransactionController do
   use StoneWeb, :controller
 
+  alias Stone.Emails
   alias Stone.Accounts
   alias Stone.Transactions
   alias Stone.Transactions.LedgerEvent
@@ -12,6 +13,8 @@ defmodule StoneWeb.TransactionController do
 
     case Transactions.withdrawal(amount, user.checking_account, transaction_id) do
       {:ok, %LedgerEvent{} = ledger_event} ->
+        Emails.send_debit_email(user, ledger_event)
+
         conn
         |> put_status(:created)
         |> render("transaction.json", ledger_event: ledger_event)
