@@ -179,6 +179,24 @@ Response
     "type": "debit"
 }
 ```
+
+#### Códigos de Erro
+- T0001 - Transaction id inválido
+- T0002 - Amount não inteiro enviado
+- T0003 - Amount enviado resultando em saldo negativo
+- T0004 - Número de conta invalido
+- T0005 - Amount negativo enviado
+- T0006 - Tentativa de transferência para mesma conta
+
+##### Exemplo retorno erro
+```json
+{
+    "error": {
+        "code": "T0001",
+        "message": "Invalid Transaction ID given d8eebd33-dde6-43f6-8213-5469c27ffe1a"
+    }
+}
+```
 ### Reports
 *Requer token para autenticação*
 
@@ -205,6 +223,18 @@ Response
             "type": "credit"
         }
     ]
+}
+```
+#### Códigos de Erro
+- R0001 - Resultado vazio para o período
+- R0002 - Número de conta inválido
+##### Exemplo retorno erro
+```json
+{
+    "error": {
+        "code": "R0001",
+        "message": "Empty ledger balance found."
+    }
 }
 ```
 
