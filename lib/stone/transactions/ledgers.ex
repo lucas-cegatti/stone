@@ -119,7 +119,7 @@ defmodule Stone.Transactions.Ledgers do
     event_date = Keyword.get(opts, :event_date, DateTime.utc_now())
 
     ledger_event = %{
-      amount: 100_000,
+      amount: 1000_00,
       description: "Initial Credit For Opening Account :)",
       type: :credit,
       checking_account_id: checking_account.id,

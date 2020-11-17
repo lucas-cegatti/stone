@@ -10,11 +10,11 @@ A versão online está disponível neste link [https://stoneapi.gigalixirapp.com
 O build da imagem docker é feito utilizando o `mix release`, migrations e seeds são rodados automaticamente, há também um arquivo docker-compose que inicia o banco e a aplicação.
 
 ### Build
-`docker build -t stone .`
+`docker-compose build stone`
 
 ou
 
-`docker-compose build stone`
+`docker build -t stone .`
 
 ### Run
 `docker-compose up`

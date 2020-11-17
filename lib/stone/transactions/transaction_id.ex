@@ -1,15 +1,13 @@
 defmodule Stone.Transactions.TransactionId do
   @moduledoc """
-  A GenServer implementation to store and retrieve Transactions IDs.
+  A Agent implementation to store and retrieve Transactions IDs.
 
   Transaction IDs are used to avoid duplicated transactions to be processed, it's only a basic and simple solution to avoid the problem.
   """
-  use GenServer
+  use Agent
 
-  @name TransactionIdGenServer
-
-  def start_link(default \\ %{}) do
-    GenServer.start_link(__MODULE__, default, name: @name)
+  def start_link(initial_value \\ %{}) do
+    Agent.start_link(fn -> initial_value end, name: __MODULE__)
   end
 
   @doc """
@@ -25,7 +23,11 @@ defmodule Stone.Transactions.TransactionId do
   """
   @spec create :: String.t()
   def create() do
-    GenServer.call(@name, {:create, []})
+    transaction_id = create_transaction_id()
+
+    Agent.update(__MODULE__, &Map.put(&1, transaction_id, []))
+
+    transaction_id
   end
 
   @doc """
@@ -42,30 +44,13 @@ defmodule Stone.Transactions.TransactionId do
   """
   @spec take(String.t()) :: {:ok, List.t()} | {:error, :not_found, String.t()}
   def take(transaction_id) do
-    GenServer.call(@name, {:take, transaction_id})
-  end
+    case Agent.get_and_update(__MODULE__, &Map.pop(&1, transaction_id)) do
+      nil ->
+        {:error, :not_found, transaction_id}
 
-  @impl true
-  def init(transaction_ids) do
-    {:ok, transaction_ids}
-  end
-
-  @impl true
-  def handle_call({:create, opts}, _from, transaction_ids) do
-    transaction_id = create_transaction_id()
-
-    {:reply, transaction_id, Map.put(transaction_ids, transaction_id, opts)}
-  end
-
-  @impl true
-  def handle_call({:take, transaction_id}, _from, transaction_ids) do
-    {data, map} =
-      case Map.pop(transaction_ids, transaction_id) do
-        {nil, map} -> {{:error, :not_found, transaction_id}, map}
-        {opts, map} -> {{:ok, opts}, map}
-      end
-
-    {:reply, data, map}
+      opts ->
+        {:ok, opts}
+    end
   end
 
   defp create_transaction_id do

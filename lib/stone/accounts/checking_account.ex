@@ -45,7 +45,7 @@ defmodule Stone.Accounts.CheckingAccount do
     |> validate_required(@required_update_fields)
   end
 
-  def create_checking_account_number do
+  defp create_checking_account_number do
     :io_lib.format("~8..0B", [:rand.uniform(100_000_000) - 1]) |> List.to_string()
   end
 

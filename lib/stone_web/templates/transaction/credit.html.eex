@@ -5,7 +5,7 @@
 <h3><%= @user.name %> - <%= @user.checking_account.number %></h3>
 
 <h4>
-Date: <%= @ledger_event.date %>
+Date: <%= @ledger_event.event_date %>
 Amount: <%= @ledger_event.amount %>
 Description: <%= @ledger_event.description %>
 ID: <%= @ledger_event.id %>
