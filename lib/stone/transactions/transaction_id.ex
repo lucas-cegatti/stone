@@ -22,7 +22,7 @@ defmodule Stone.Transactions.TransactionId do
       "18a0a7ed-00c0-4c8b-86e9-cafe8588e823"
   """
   @spec create :: String.t()
-  def create() do
+  def create do
     transaction_id = create_transaction_id()
 
     Agent.update(__MODULE__, &Map.put(&1, transaction_id, []))

@@ -1,8 +1,8 @@
 defmodule StoneWeb.TransactionController do
   use StoneWeb, :controller
 
-  alias Stone.Emails
   alias Stone.Accounts
+  alias Stone.Emails
   alias Stone.Transactions
   alias Stone.Transactions.LedgerEvent
 

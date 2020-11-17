@@ -22,10 +22,10 @@ defmodule Stone.Transactions.Ledgers do
 
   @name CheckingAccountLedgers
 
-  alias Stone.Repo
   alias Stone.Accounts
   alias Stone.Accounts.CheckingAccount
-  alias Stone.Transactions.{LedgerEvent, TransactionError, LedgerState}
+  alias Stone.Repo
+  alias Stone.Transactions.{LedgerEvent, LedgerState, TransactionError}
 
   def start_link(default \\ %{}) do
     GenServer.start_link(__MODULE__, default, name: @name)
@@ -119,7 +119,7 @@ defmodule Stone.Transactions.Ledgers do
     event_date = Keyword.get(opts, :event_date, DateTime.utc_now())
 
     ledger_event = %{
-      amount: 1000_00,
+      amount: 100_000,
       description: "Initial Credit For Opening Account :)",
       type: :credit,
       checking_account_id: checking_account.id,
@@ -138,7 +138,7 @@ defmodule Stone.Transactions.Ledgers do
     end
   end
 
-  def get_status() do
+  def get_status do
     :sys.get_status(@name)
   end
 
@@ -343,17 +343,17 @@ defmodule Stone.Transactions.Ledgers do
 
             case current_date == grouped_date do
               true ->
-                new_balance =
-                  {current_date,
-                   %{
-                     total_credits:
-                       current_ledger_balance.total_credits + grouped_ledger_balance.total_credits,
-                     total_debits:
-                       current_ledger_balance.total_debits + grouped_ledger_balance.total_debits,
-                     total: current_ledger_balance.total + grouped_ledger_balance.total
-                   }, grouped_ledger_events ++ current_ledger_events}
-
-                List.replace_at(ledger_balances, 0, new_balance)
+                ledger_balances
+                |> List.replace_at(
+                  0,
+                  new_ledger_balance(
+                    current_date,
+                    current_ledger_balance,
+                    grouped_ledger_balance,
+                    current_ledger_events,
+                    grouped_ledger_events
+                  )
+                )
 
               false ->
                 [ledger_balance | ledger_balances]
@@ -364,11 +364,26 @@ defmodule Stone.Transactions.Ledgers do
     %LedgerState{ledger_state | ledger_balances: ledger_balances, ledger_events: []}
   end
 
+  defp new_ledger_balance(
+         current_date,
+         current_ledger_balance,
+         grouped_ledger_balance,
+         current_ledger_events,
+         grouped_ledger_events
+       ) do
+    {current_date,
+     %{
+       total_credits: current_ledger_balance.total_credits + grouped_ledger_balance.total_credits,
+       total_debits: current_ledger_balance.total_debits + grouped_ledger_balance.total_debits,
+       total: current_ledger_balance.total + grouped_ledger_balance.total
+     }, grouped_ledger_events ++ current_ledger_events}
+  end
+
   defp reply(response, state) do
     {:reply, response, state}
   end
 
-  defp initial_ledger() do
+  defp initial_ledger do
     %LedgerState{balance: 0, ledger_events: []}
   end
 

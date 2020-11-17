@@ -5,11 +5,11 @@ defmodule Stone.Accounts do
 
   import Ecto.Query, warn: false
 
-  alias Stone.Repo
   alias Ecto.Multi
+  alias Stone.Accounts.{CheckingAccount, User}
   alias Stone.Guardian
-  alias Stone.Accounts.{User, CheckingAccount}
-  alias Stone.Transactions.{Ledgers, LedgerEvent}
+  alias Stone.Repo
+  alias Stone.Transactions.{LedgerEvent, Ledgers}
 
   @doc """
   Returns the list of users.
@@ -198,7 +198,7 @@ defmodule Stone.Accounts do
       iex> list_checking_accounts()
       [%Stone.Accounts.CheckingAccount{}]
   """
-  def list_checking_accounts() do
+  def list_checking_accounts do
     ledger_events_query = from(le in LedgerEvent, order_by: [desc: le.event_date])
 
     from(ca in CheckingAccount, preload: [:user, ledger_events: ^ledger_events_query])

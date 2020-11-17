@@ -94,10 +94,8 @@ defmodule Stone.AccountsTest do
     end
 
     test "create_user_with_checking_account/1 with valid data creates user with account" do
-      assert {:ok, %User{} = user} = Accounts.create_user_with_checking_account(@valid_attrs)
-
-      assert user.checking_account
-      assert user.checking_account.number
+      assert {:ok, %User{checking_account: %CheckingAccount{}} = _user} =
+               Accounts.create_user_with_checking_account(@valid_attrs)
     end
 
     test "create_user_with_checking_account/1 with valid data creates user account with 1_000 in balance " do
@@ -119,7 +117,6 @@ defmodule Stone.AccountsTest do
 
       assert ledger_event.type == :credit
       assert ledger_event.amount == 100_000
-      # assert ledger_event.number == 1
     end
 
     test "create_user with existing email returns an error" do
@@ -142,7 +139,8 @@ defmodule Stone.AccountsTest do
     test "get_checking_account_by_number/1 returns a valid checking account" do
       assert {:ok, %User{} = user} = Accounts.create_user_with_checking_account(@valid_attrs)
 
-      assert %CheckingAccount{} = Accounts.get_checking_account_by_number(user.checking_account.number)
+      assert %CheckingAccount{} =
+               Accounts.get_checking_account_by_number(user.checking_account.number)
     end
 
     test "get_checking_account_by_number/1 with invalid number returns nil" do

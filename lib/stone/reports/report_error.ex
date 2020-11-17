@@ -7,7 +7,7 @@ defmodule Stone.Reports.ReportError do
 
   defexception [:code, :message, :plug_status]
 
-  def empty_ledger_balance() do
+  def empty_ledger_balance do
     %__MODULE__{
       code: "R0001",
       message: "Empty ledger balance found.",

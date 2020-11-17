@@ -5,9 +5,9 @@ defmodule Stone.Reports do
 
   import Ecto.Query, warn: false
 
-  alias Stone.Transactions.Ledgers
   alias Stone.Accounts.CheckingAccount
   alias Stone.Reports.{Report, ReportError}
+  alias Stone.Transactions.Ledgers
 
   @doc """
   Gets the total transactions of the day of the given checking account

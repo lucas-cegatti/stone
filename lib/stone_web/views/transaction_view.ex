@@ -1,7 +1,7 @@
 defmodule StoneWeb.TransactionView do
   use StoneWeb, :view
-  alias StoneWeb.TransactionView
   alias Stone.Transactions.TransactionError
+  alias StoneWeb.TransactionView
 
   def render("index.json", %{transactions: transactions}) do
     %{data: render_many(transactions, TransactionView, "transaction.json")}

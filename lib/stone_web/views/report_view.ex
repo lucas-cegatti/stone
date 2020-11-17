@@ -2,7 +2,7 @@ defmodule StoneWeb.ReportView do
   use StoneWeb, :view
   alias StoneWeb.ReportView
 
-  alias Stone.Reports.{ReportError, Report}
+  alias Stone.Reports.{Report, ReportError}
 
   def render("index.json", %{reports: reports}) do
     %{data: render_many(reports, ReportView, "report.json")}

@@ -16,6 +16,8 @@ defmodule Stone.DataCase do
 
   use ExUnit.CaseTemplate
 
+  alias Ecto.Adapters.SQL.Sandbox
+
   using do
     quote do
       alias Stone.Repo
@@ -28,10 +30,10 @@ defmodule Stone.DataCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Stone.Repo)
+    :ok = Sandbox.checkout(Stone.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Stone.Repo, {:shared, self()})
+      Sandbox.mode(Stone.Repo, {:shared, self()})
     end
 
     :ok

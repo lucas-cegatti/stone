@@ -6,7 +6,7 @@ defmodule Stone.Transactions do
   import Ecto.Query, warn: false
 
   alias Stone.Accounts.CheckingAccount
-  alias Stone.Transactions.{TransactionId, TransactionError, Ledgers}
+  alias Stone.Transactions.{Ledgers, TransactionError, TransactionId}
 
   @doc """
   Returns a UUID stored at the gen server to be used for a user transaction.
@@ -18,7 +18,7 @@ defmodule Stone.Transactions do
       iex> get_transaction_id_for_checking_account()
       String.t()
   """
-  def get_transaction_id_for_checking_account() do
+  def get_transaction_id_for_checking_account do
     TransactionId.create()
   end
 

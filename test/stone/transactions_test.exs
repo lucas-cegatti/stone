@@ -4,7 +4,7 @@ defmodule Stone.TransactionsTest do
 
   alias Stone.Accounts
   alias Stone.Transactions
-  alias Stone.Transactions.{TransactionError, LedgerEvent}
+  alias Stone.Transactions.{LedgerEvent, TransactionError}
 
   describe "transactions withdrawal" do
     setup :setup_checking_account

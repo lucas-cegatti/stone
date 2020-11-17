@@ -3,7 +3,7 @@ defmodule Stone.ReportsTest do
 
   alias Stone.Accounts.CheckingAccount
   alias Stone.Reports.{Report, ReportError}
-  alias Stone.{Reports, Accounts, Transactions}
+  alias Stone.{Accounts, Reports, Transactions}
 
   describe "day reports" do
     setup [:setup_checking_account]
