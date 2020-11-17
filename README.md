@@ -4,10 +4,10 @@ Código com a solução para o desafio [API de Banking da Stone](https://gist.gi
 A versão online está disponível neste link [https://stoneapi.gigalixirapp.com/api/v1](https://stoneapi.gigalixirapp.com/api/v1)
 ## Versions
 - Elixir 1.11.2
-- OTP 22
+- OTP 22.3.2
 
 ## Docker
-O build da imagem docker é feito utilizando o `mix release`, migrations e seeds são rodados automaticamente, há também um arquivo docker-compose que o banco e o app.
+O build da imagem docker é feito utilizando o `mix release`, migrations e seeds são rodados automaticamente, há também um arquivo docker-compose que inicia o banco e a aplicação.
 
 ### Build
 `docker build -t stone .`
@@ -30,7 +30,7 @@ docker run -e DB_NAME=stone_dev \
 -e SECRET_KEY_BASE=MBBhVeA0yci+a94dbzKqgog3yjNKVHe63FFPEHmsELr6idwPivSxRNSUIs09B13w \
 stone
 ```
-Iniciar via docker requer um database local rodando e que seja acessível pela imagem
+Iniciar via docker requer um database local rodando e que seja acessível pela imagem.
 ## API
 A API utiliza autenticação via JWT token onde deve ser enviado o `Authorization` header nas apis que requerem autenticação.
 
@@ -50,16 +50,16 @@ A API utiliza autenticação via JWT token onde deve ser enviado o `Authorizatio
 Request
 ```json
 {
-	"user": {
-    "name": "Bar",
-	  "email": "bar@foo.com",
-	  "password": "somePassword",
-	  "password_confirmation": "somePassword"
-	}
+    "user": {
+        "name": "Bar",
+        "email": "bar@foo.com",
+        "password": "somePassword",
+        "password_confirmation": "somePassword"
+    }
 }
 ```
 Response
-```
+```json
 {
     "data": {
         "checking_account": {
@@ -157,6 +157,7 @@ Response
 ```
 ### Reports
 *Requer token para autenticação*
+
 Foram criadas 4 rotas para os relatórios:
 - `/day` - Retorna o total agregado + as transações de 1 dia
 - `/month` - Retorna o total agregado + as transações dos últimos 30 dias
