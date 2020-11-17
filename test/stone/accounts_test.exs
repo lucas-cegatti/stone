@@ -2,6 +2,7 @@ defmodule Stone.AccountsTest do
   use Stone.DataCase
 
   alias Stone.Accounts
+  alias Stone.Accounts.CheckingAccount
 
   describe "users" do
     alias Stone.Accounts.User
@@ -126,6 +127,38 @@ defmodule Stone.AccountsTest do
 
       assert {:error, %Ecto.Changeset{}} =
                Accounts.create_user_with_checking_account(@valid_attrs)
+    end
+
+    test "get_checking_acount_by_id/1 returns a valid checking account" do
+      assert {:ok, %User{} = user} = Accounts.create_user_with_checking_account(@valid_attrs)
+
+      assert %CheckingAccount{} = Accounts.get_checking_acount_by_id(user.checking_account.id)
+    end
+
+    test "get_checking_acount_by_id/1 with invalid id returns nil" do
+      assert nil == Accounts.get_checking_acount_by_id(Ecto.UUID.generate())
+    end
+
+    test "get_checking_account_by_number/1 returns a valid checking account" do
+      assert {:ok, %User{} = user} = Accounts.create_user_with_checking_account(@valid_attrs)
+
+      assert %CheckingAccount{} = Accounts.get_checking_account_by_number(user.checking_account.number)
+    end
+
+    test "get_checking_account_by_number/1 with invalid number returns nil" do
+      assert nil == Accounts.get_checking_account_by_number("invalid")
+    end
+
+    test "list_checking_accounts/0 returns a list of all registered checking accounts" do
+      assert {:ok, %User{}} = Accounts.create_user_with_checking_account(@valid_attrs)
+
+      assert checking_accounts = Accounts.list_checking_accounts()
+
+      assert length(checking_accounts) == 1
+    end
+
+    test "list_checking_accounts/0 returns an empty list when there's no checking account registered" do
+      assert [] == Accounts.list_checking_accounts()
     end
   end
 end

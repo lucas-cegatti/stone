@@ -1,6 +1,6 @@
 defmodule Stone.Accounts do
   @moduledoc """
-  The Accounts context.
+  Accounts module used to access all function related to users and checking accounts
   """
 
   import Ecto.Query, warn: false
@@ -156,10 +156,29 @@ defmodule Stone.Accounts do
     end
   end
 
+  @doc """
+  Gets a single checking account by id
+
+  ## Examples
+
+      iex> get_checking_acount_by_id(checking_account_id)
+      %Stone.Accounts.CheckingAccount{}
+  """
   def get_checking_acount_by_id(checking_account_id) do
     Repo.get(CheckingAccount, checking_account_id) |> Repo.preload(:ledger_events)
   end
 
+  @doc """
+  Gets a single checking account by its number
+
+  ## Examples
+
+      iex> get_checking_account_by_number(checking_account_number)
+      %Stone.Accounts.CheckingAccount{}
+
+      iex> get_checking_account_by_number("invalid")
+      nil
+  """
   def get_checking_account_by_number(account_number) do
     Repo.get_by(CheckingAccount, number: account_number)
     |> case do
@@ -171,6 +190,14 @@ defmodule Stone.Accounts do
     end
   end
 
+  @doc """
+  Gets all checking accounts.
+
+  ## Examples
+
+      iex> list_checking_accounts()
+      [%Stone.Accounts.CheckingAccount{}]
+  """
   def list_checking_accounts() do
     ledger_events_query = from(le in LedgerEvent, order_by: [desc: le.event_date])
 
