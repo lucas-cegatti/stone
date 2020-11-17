@@ -1,6 +1,6 @@
 defmodule Stone.Transactions.TransactionId do
   @moduledoc """
-  A Agent implementation to store and retrieve Transactions IDs.
+  An Agent implementation to store and retrieve Transactions IDs.
 
   Transaction IDs are used to avoid duplicated transactions to be processed, it's only a basic and simple solution to avoid the problem.
   """
@@ -11,7 +11,7 @@ defmodule Stone.Transactions.TransactionId do
   end
 
   @doc """
-  Creates a new transaction id, stores it at the GenServer state and returns the new id.
+  Creates a new transaction id, stores it at the Agent state and returns the new id.
 
   Transaction ids are UUID generated via `Ecto.UUID.generate/0`
 
@@ -31,7 +31,7 @@ defmodule Stone.Transactions.TransactionId do
   end
 
   @doc """
-  Takes the transaction id, this is used to validate if the transaction id is valid, i.e. it's present at the GenServer state.
+  Takes the transaction id, this is used to validate if the transaction id is valid, i.e. it's present at the Agent state.
 
   Returns {:ok, opts} | {:error, :not_found, String.t()}
 
