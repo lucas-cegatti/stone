@@ -36,6 +36,7 @@ A API utiliza autenticação via JWT token onde deve ser enviado o `Authorizatio
 
 - [/api/v1/sign_up](#sign-up)
 - [/api/v1/sign_in](#sign-in)
+- [/api/v1/self](#self)
 - [/api/v1/transaction_id](#transaction-id)
 - [/api/v1/withdrawal](#withdrawal)
 - [/api/v1/transfer](#transfer)
@@ -90,6 +91,29 @@ Response
     "token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJzdG9uZSIsImV4cCI6MTYwNzg1ODE5NiwiaWF0IjoxNjA1NDM4OTk2LCJpc3MiOiJzdG9uZSIsImp0aSI6IjVhYjI3NzQ3LWVmZjktNDlmMi04Mzc1LTA3ZTNiNmMzNjg5MiIsIm5iZiI6MTYwNTQzODk5NSwic3ViIjoiMmI5MTUzYmQtZWZjMS00Mjg5LWFmOGItMTFlNjg0NmJjYzA0IiwidHlwIjoiYWNjZXNzIn0.KnOAvbdiXE5Hadk24FBzsj4USyr1fzpf69SWZyUqyfQ72fYqS8UDzLaszotgjuLZo0sqKXiNlfiW6S6AGYD7XQ"
 }
 ```
+
+### Self
+*Requer token para autenticação*
+
+*GET* `/self` - Retorna os dados do usuário logado.
+
+Response
+```json
+{
+    "data": {
+        "checking_account": {
+            "balance": 100000,
+            "number": "73960914"
+        },
+        "user": {
+            "email": "bar@foo.com",
+            "id": "2b9153bd-efc1-4289-af8b-11e6846bcc04",
+            "name": "Bar"
+        }
+    }
+}
+```
+
 ### Transactions
 *Requer token para autenticação*
 #### Transaction ID
