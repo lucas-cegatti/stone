@@ -1,4 +1,7 @@
 defmodule StoneWeb.Telemetry do
+  @moduledoc """
+  Takes metrics to be displayed at the dashboard.
+  """
   use Supervisor
   import Telemetry.Metrics
 

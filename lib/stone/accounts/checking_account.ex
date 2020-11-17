@@ -1,4 +1,7 @@
 defmodule Stone.Accounts.CheckingAccount do
+  @moduledoc """
+  Schema representing a user checking account at the database.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -150,8 +150,8 @@ Response
 ```
 {
     "amount": 10000,
-    "description": "Withdrawal from checking account",
-    "id": "7a1859d4-9461-4f85-9b5d-9fed5b85b02e",
+    "description": "Transfered to 73960914",
+    "id": "39e1c707-0865-4f28-8aa5-0cbb0f668924",
     "type": "debit"
 }
 ```
@@ -183,3 +183,6 @@ Response
     ]
 }
 ```
+
+### Email
+Para o email é apenas feito um registro via `Logger.warn()` a geração do conteúdo html é feita através do template Phoenix.

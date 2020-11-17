@@ -1,4 +1,7 @@
 defmodule Stone.Accounts.User do
+  @moduledoc """
+  Schema representing a user at the database.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

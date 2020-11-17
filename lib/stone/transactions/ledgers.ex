@@ -1,8 +1,20 @@
 defmodule Stone.Transactions.Ledgers do
   @moduledoc """
-  Ledgers Module is used to store the checking accounts ledger state into a Gen Stage.
+  Ledgers Module is used to store the checking accounts ledger state into a Gen Server.
 
-  This module will update its own GenStage state as well as the database state.
+  This module will update its own GenServer state as well as the database state.
+
+  The main struct of this GenServer's state is:
+  %{
+    Stone.Accounts.CheckingAccount.number: %Stone.Transactions.LedgerState{}
+  }
+
+  For every new transaction (`withdrawal` or `transfer`) a new ledger event is created and stored at the database, the database is used
+  only as a second source and backup.
+
+  All events are grouped by day having their totals and ledger events per day. This is to make it less data to calculate considering that the minimum range of
+  report data is per day.
+
   """
   use GenServer
 
@@ -331,20 +343,14 @@ defmodule Stone.Transactions.Ledgers do
 
             case current_date == grouped_date do
               true ->
-                total_credits =
-                  current_ledger_balance.total_credits + grouped_ledger_balance.total_credits
-
-                total_debits =
-                  current_ledger_balance.total_debits + grouped_ledger_balance.total_debits
-
-                total = current_ledger_balance.total + grouped_ledger_balance.total
-
                 new_balance =
                   {current_date,
                    %{
-                     total_credits: total_credits,
-                     total_debits: total_debits,
-                     total: total
+                     total_credits:
+                       current_ledger_balance.total_credits + grouped_ledger_balance.total_credits,
+                     total_debits:
+                       current_ledger_balance.total_debits + grouped_ledger_balance.total_debits,
+                     total: current_ledger_balance.total + grouped_ledger_balance.total
                    }, grouped_ledger_events ++ current_ledger_events}
 
                 List.replace_at(ledger_balances, 0, new_balance)

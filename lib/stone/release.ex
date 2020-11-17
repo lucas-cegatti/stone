@@ -10,7 +10,7 @@ defmodule Stone.Release do
     :ecto_sql
   ]
 
-  @repos Application.fetch_env!(@app, :ecto_repos)
+  @repos [Stone.Repo]
 
   def run do
     migrate()
