@@ -49,6 +49,18 @@ defmodule StoneWeb.UserControllerTest do
       conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
+
+    test "renders errors when password do not match", %{conn: conn} do
+      create_attrs = %{@create_attrs | password_confirmation: "noMatch"}
+
+      conn = post(conn, Routes.user_path(conn, :create), user: create_attrs)
+
+      response = json_response(conn, 422)["errors"]
+
+      assert response != %{}
+
+      assert %{"password_confirmation" => ["Passwords do not match"]} == response
+    end
   end
 
   describe "sign_in" do
